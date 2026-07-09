@@ -8,6 +8,7 @@ backend/.env*
 frontend/.env*
 dist/
 frontend/dist/
+dist/
 .angular/
 frontend/.angular/
 coverage/
