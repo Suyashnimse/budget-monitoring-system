@@ -4,6 +4,8 @@ frontend/node_modules/
 .env
 backend/.env
 frontend/.env
+backend/.env*
+frontend/.env*
 dist/
 frontend/dist/
 .angular/
