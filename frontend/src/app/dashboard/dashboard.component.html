@@ -1,0 +1,46 @@
+<div class="card dashboard-card">
+  <h2>Dashboard</h2>
+  <p>Overview of your current financial status.</p>
+
+  <div class="summary-grid">
+    <div class="summary-item">
+      <div class="label">Total Budget</div>
+      <div class="value">₹{{ totalBudget }}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Total Expenses</div>
+      <div class="value">₹{{ totalExpense }}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Remaining Budget</div>
+      <div class="value">₹{{ totalBudget - totalExpense }}</div>
+    </div>
+    <div class="summary-item">
+      <div class="label">Utilization %</div>
+      <div class="value">{{ utilizationPercent }}%</div>
+    </div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>Pie Chart</h3>
+      <div class="chart-placeholder">Budget vs Expense</div>
+    </div>
+    <div class="chart-card">
+      <h3>Bar Chart</h3>
+      <div class="chart-placeholder">Monthly spending</div>
+    </div>
+    <div class="chart-card">
+      <div class="chart-placeholder">Line Chart</div>
+      <h3>Line Chart</h3>
+    </div>
+  </div>
+
+  <div class="alerts-section">
+    <h3>Recent Alerts</h3>
+    <div *ngIf="alert; else noAlert" class="alert-box">{{ alert }}</div>
+    <ng-template #noAlert>
+      <div class="alert-box muted">No recent alerts</div>
+    </ng-template>
+  </div>
+</div>

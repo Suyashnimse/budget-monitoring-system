@@ -1,0 +1,30 @@
+<div class="card">
+  <h2>Budget Plan</h2>
+  <p>Set and review your planned allocations for the month.</p>
+
+  <form (ngSubmit)="submitBudget()">
+    <div class="form-group">
+      <label for="financialYear">Financial Year</label>
+      <input id="financialYear" name="financialYear" [(ngModel)]="budget.financialYear" required />
+    </div>
+
+    <div class="form-group">
+      <label for="department">Department</label>
+      <input id="department" name="department" [(ngModel)]="budget.department" required />
+    </div>
+
+    <div class="form-group">
+      <label for="allocatedAmount">Allocated Amount</label>
+      <input id="allocatedAmount" name="allocatedAmount" type="number" [(ngModel)]="budget.allocatedAmount" required />
+    </div>
+
+    <div class="form-group">
+      <label for="allocationDate">Allocation Date</label>
+      <input id="allocationDate" name="allocationDate" type="date" [(ngModel)]="budget.allocationDate" required />
+    </div>
+
+    <button type="submit">Save</button>
+  </form>
+
+  <p *ngIf="message">{{ message }}</p>
+</div>

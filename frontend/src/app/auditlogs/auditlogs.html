@@ -1,0 +1,26 @@
+<div class="card">
+  <h2>Audit Logs</h2>
+  <p>Track recent system changes and user actions.</p>
+
+  <table>
+    <thead>
+      <tr>
+        <th>User</th>
+        <th>Action</th>
+        <th>Details</th>
+        <th>Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let log of logs">
+        <td>{{ log.user || 'System' }}</td>
+        <td>{{ log.action }}</td>
+        <td>{{ log.details || '-' }}</td>
+        <td>{{ log.createdAt | date:'medium' }}</td>
+      </tr>
+      <tr *ngIf="!logs.length">
+        <td colspan="4">No audit logs available.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
