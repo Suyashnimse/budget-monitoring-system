@@ -1,0 +1,30 @@
+<section class="department-page">
+  <h2>Add Department</h2>
+
+  <form (ngSubmit)="saveDepartment()" #departmentForm="ngForm">
+    <label for="name">Department Name</label>
+    <input id="name" name="name" [(ngModel)]="department.name" required />
+
+    <label for="code">Department Code</label>
+    <input id="code" name="code" [(ngModel)]="department.code" required />
+
+    <label for="description">Description</label>
+    <textarea id="description" name="description" [(ngModel)]="department.description"></textarea>
+
+    <button type="submit">Save</button>
+  </form>
+
+  <p *ngIf="message">{{ message }}</p>
+
+  <h3>Saved Departments</h3>
+  <ul *ngIf="departments.length; else emptyState">
+    <li *ngFor="let item of departments">
+      {{ item.name }} ({{ item.code }}) - {{ item.description || 'No description' }}
+      <button type="button" (click)="deleteDepartment(item._id)">Delete</button>
+    </li>
+  </ul>
+
+  <ng-template #emptyState>
+    <p>No departments saved yet.</p>
+  </ng-template>
+</section>

@@ -1,0 +1,18 @@
+<div class="card">
+  <h2>Welcome back</h2>
+  <p>Sign in to track your budgets, spending, and alerts.</p>
+
+  <form (ngSubmit)="login()">
+    <label>Email</label>
+    <br>
+    <input type="email" placeholder="Email" [(ngModel)]="email" name="email">
+    <br><br>
+
+    <label>Password</label>
+    <br>
+    <input type="password" placeholder="Password" [(ngModel)]="password" name="password">
+    <br><br>
+
+    <button type="submit">Login</button>
+  </form>
+</div>
