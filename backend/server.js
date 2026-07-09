@@ -13,10 +13,12 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const auditLogRoutes = require("./routes/auditLogRoutes");
 const User = require("./models/User");
 const JWT_SECRET = process.env.JWT_SECRET || "budget-monitoring-secret";
+const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/budget_monitoring";
+const PORT = process.env.PORT || 3000;
 
-mongoose.connect(process.env.MONGO_URI)
-.then(() => console.log("MongoDB Connected"))
-.catch(err => console.log(err));
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("MongoDB Connected"))
+  .catch(err => console.log("MongoDB Error:", err));
 
 app.use(express.json());
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
@@ -78,7 +80,6 @@ app.use("/department", departmentRoutes);
 app.use("/auditlogs", auditLogRoutes);
 app.use("/api", uploadRoutes);
 
-const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log("Server Running");
+  console.log("Server Running on Port", PORT);
 });
