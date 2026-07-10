@@ -21,7 +21,7 @@ export class Users implements OnInit {
   }
 
   loadDepartments() {
-    this.http.get<any[]>('http://localhost:3000/department').subscribe({
+    this.http.get<any[]>('https://budget-monitoring-system.onrender.com/department').subscribe({
       next: (data) => this.departments = data,
       error: () => this.message = 'Unable to load departments.'
     });
@@ -33,7 +33,7 @@ export class Users implements OnInit {
       return;
     }
 
-    this.http.post('http://localhost:3000/department/add', this.department).subscribe({
+    this.http.post('https://budget-monitoring-system.onrender.com/department/add', this.department).subscribe({
       next: () => {
         this.message = 'Department Created';
         this.department = { name: '', code: '', description: '' };
@@ -45,7 +45,7 @@ export class Users implements OnInit {
     });
   }
   deleteDepartment(id: string) {
-    this.http.delete(`http://localhost:3000/department/delete/${id}`).subscribe({
+    this.http.delete(`https://budget-monitoring-system.onrender.com/department/delete/${id}`).subscribe({
       next: () => {
         this.message = 'Department Deleted';
         this.loadDepartments();

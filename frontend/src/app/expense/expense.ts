@@ -21,7 +21,7 @@ export class Expense {
   constructor(private http: HttpClient) {}
 
   submitExpense() {
-    this.http.post('http://localhost:3000/expense/add', this.expense).subscribe({
+    this.http.post('https://budget-monitoring-system.onrender.com/expense/add', this.expense).subscribe({
       next: () => {
         this.message = 'Expense Added';
         this.expense = {

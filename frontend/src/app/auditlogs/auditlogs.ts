@@ -18,7 +18,7 @@ export class Auditlogs implements OnInit {
   }
 
   loadLogs() {
-    this.http.get<any[]>('http://localhost:3000/auditlogs').subscribe({
+    this.http.get<any[]>('https://budget-monitoring-system.onrender.com/auditlogs').subscribe({
       next: (data) => this.logs = data,
       error: () => this.logs = []
     });
