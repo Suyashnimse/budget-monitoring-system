@@ -23,14 +23,14 @@ export class Dashboard implements OnInit {
   }
 
   loadSummary() {
-    this.http.get<any[]>('http://localhost:3000/budget').subscribe({
+    this.http.get<any[]>('https://budget-monitoring-system.onrender.com/budget').subscribe({
       next: (budgets) => {
         this.totalBudget = budgets.reduce((sum, item) => sum + (item.allocatedAmount || 0), 0);
         this.refreshUtilization();
       }
     });
 
-    this.http.get<any[]>('http://localhost:3000/expense').subscribe({
+    this.http.get<any[]>('https://budget-monitoring-system.onrender.com/expense').subscribe({
       next: (expenses) => {
         this.totalExpense = expenses.reduce((sum, item) => sum + (item.amount || 0), 0);
         const recentExpenses = expenses.slice(-3);
