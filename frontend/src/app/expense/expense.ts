@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-expense',
@@ -16,12 +17,14 @@ export class Expense {
     category: '',
     date: ''
   };
+  categoryOptions = ['Medical Supplies', 'Office Equipment', 'Road Maintenance', 'Training Program', 'Farmer Subsidy'];
   message = '';
+  private apiUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
   submitExpense() {
-    this.http.post('https://budget-monitoring-system.onrender.com/expense/add', this.expense).subscribe({
+    this.http.post(this.apiUrl + '/expense/add', this.expense).subscribe({
       next: () => {
         this.message = 'Expense Added';
         this.expense = {

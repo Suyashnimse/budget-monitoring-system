@@ -10,7 +10,10 @@
 
     <div class="form-group">
       <label for="department">Department</label>
-      <input id="department" name="department" [(ngModel)]="budget.department" required />
+      <select id="department" name="department" [(ngModel)]="budget.department" required>
+        <option value="">Select a department</option>
+        <option *ngFor="let department of departmentOptions" [value]="department">{{ department }}</option>
+      </select>
     </div>
 
     <div class="form-group">

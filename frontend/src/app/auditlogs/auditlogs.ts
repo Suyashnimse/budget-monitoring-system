@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-auditlogs',
@@ -10,6 +11,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class Auditlogs implements OnInit {
   logs: any[] = [];
+  private apiUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
@@ -18,7 +20,7 @@ export class Auditlogs implements OnInit {
   }
 
   loadLogs() {
-    this.http.get<any[]>('https://budget-monitoring-system.onrender.com/auditlogs').subscribe({
+    this.http.get<any[]>(this.apiUrl + '/auditlogs').subscribe({
       next: (data) => this.logs = data,
       error: () => this.logs = []
     });

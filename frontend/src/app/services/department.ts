@@ -6,19 +6,19 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class DepartmentService {
-  private readonly apiUrl = `${environment.apiBaseUrl}/api/department`;
+  private readonly apiUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
   getDepartments() {
-    return this.http.get(this.apiUrl);
+    return this.http.get(this.apiUrl + '/department');
   }
 
   createDepartment(data: any) {
-    return this.http.post(`${this.apiUrl}/add`, data);
+    return this.http.post(this.apiUrl + '/department/add', data);
   }
 
   deleteDepartment(id: string) {
-    return this.http.delete(`${this.apiUrl}/delete/${id}`);
+    return this.http.delete(this.apiUrl + '/department/delete/' + id);
   }
 }

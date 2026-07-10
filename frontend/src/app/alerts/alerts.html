@@ -1,1 +1,14 @@
-<p>alerts works!</p>
+<div class="alerts-page">
+  <h2>Alerts</h2>
+  <p>Total Alerts: {{ totalAlerts }}</p>
+
+  <div *ngIf="errorMessage" class="alert-error">{{ errorMessage }}</div>
+
+  <ul *ngIf="!errorMessage && alerts.length; else noAlerts">
+    <li *ngFor="let item of alerts">{{ item }}</li>
+  </ul>
+
+  <ng-template #noAlerts>
+    <p>No alerts available.</p>
+  </ng-template>
+</div>

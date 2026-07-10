@@ -19,21 +19,30 @@
       <div class="label">Utilization %</div>
       <div class="value">{{ utilizationPercent }}%</div>
     </div>
+    <div class="summary-item">
+      <div class="label">Active Alerts</div>
+      <div class="value">{{ totalAlerts }}</div>
+    </div>
   </div>
 
   <div class="charts-grid">
     <div class="chart-card">
-      <h3>Pie Chart</h3>
-      <div class="chart-placeholder">Budget vs Expense</div>
+      <h3>Budget Used</h3>
+      <div class="chart-placeholder">Budget Used</div>
     </div>
     <div class="chart-card">
-      <h3>Bar Chart</h3>
-      <div class="chart-placeholder">Monthly spending</div>
+      <h3>Budget Remaining</h3>
+      <div class="chart-placeholder">Budget Remaining</div>
     </div>
     <div class="chart-card">
-      <div class="chart-placeholder">Line Chart</div>
-      <h3>Line Chart</h3>
+      <div class="chart-placeholder">Monthly Spending Trend</div>
+      <h3>Monthly Spending Trend</h3>
     </div>
+  </div>
+
+  <div class="alerts-section">
+    <h3>Department-wise Utilization</h3>
+    <div class="chart-placeholder">Finance: 52.5% · Education: 40% · Health: 70%</div>
   </div>
 
   <div class="alerts-section">
