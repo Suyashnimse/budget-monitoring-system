@@ -16,6 +16,25 @@
 
   <p *ngIf="message">{{ message }}</p>
 
+  <h3>Create User</h3>
+  <form (ngSubmit)="createUser()" #userForm="ngForm">
+    <label for="userName">Full Name</label>
+    <input id="userName" name="userName" [(ngModel)]="user.name" required />
+
+    <label for="userEmail">Email</label>
+    <input id="userEmail" name="userEmail" type="email" [(ngModel)]="user.email" required />
+
+    <label for="userPassword">Password</label>
+    <input id="userPassword" name="userPassword" type="password" [(ngModel)]="user.password" required />
+
+    <label for="userRole">Role</label>
+    <select id="userRole" name="userRole" [(ngModel)]="user.role">
+      <option *ngFor="let role of availableRoles" [value]="role">{{ role }}</option>
+    </select>
+
+    <button type="submit">Create User</button>
+  </form>
+
   <h3>Saved Departments</h3>
   <ul *ngIf="departments.length; else emptyState">
     <li *ngFor="let item of departments">

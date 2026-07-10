@@ -15,7 +15,10 @@
 
     <div class="form-group">
       <label for="category">Category</label>
-      <input id="category" name="category" [(ngModel)]="expense.category" required />
+      <select id="category" name="category" [(ngModel)]="expense.category" required>
+        <option value="">Select a category</option>
+        <option *ngFor="let category of categoryOptions" [value]="category">{{ category }}</option>
+      </select>
     </div>
 
     <div class="form-group">

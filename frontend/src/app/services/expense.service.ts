@@ -6,7 +6,7 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ExpenseService {
-  private readonly apiUrl = `${environment.apiBaseUrl}/expense`;
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/expense`;
 
   constructor(private http: HttpClient) {}
 

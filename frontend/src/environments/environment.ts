@@ -1,4 +1,4 @@
 export const environment = {
   production: false,
-  apiBaseUrl: 'https://budget-monitoring-system.onrender.com'
+  apiBaseUrl: 'http://localhost:3000'
 };

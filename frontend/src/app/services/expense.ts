@@ -1,21 +1,20 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
-export class BudgetService {
-
+export class ExpenseService {
   private readonly apiUrl = environment.apiBaseUrl;
 
   constructor(private http: HttpClient) {}
 
-  getBudgets() {
-    return this.http.get(`${this.apiUrl}/budget`);
+  getExpenses() {
+    return this.http.get(this.apiUrl + '/expense');
   }
 
-  createBudget(data: any) {
-    return this.http.post(`${this.apiUrl}/budget/add`, data);
+  createExpense(data: any) {
+    return this.http.post(this.apiUrl + '/expense/add', data);
   }
 }
