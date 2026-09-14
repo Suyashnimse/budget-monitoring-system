@@ -25,20 +25,30 @@
           <p class="eyebrow">Personal information</p>
           <h3>Account details</h3>
         </div>
-        <span class="verified-label">Verified workspace</span>
+        <button class="edit-button" type="button" (click)="editing = !editing">{{ editing ? 'Cancel' : 'Edit profile' }}</button>
       </div>
 
-      <div class="details-grid">
+      <div class="details-grid" *ngIf="!editing">
         <div class="detail-item"><span>Full name</span><strong>{{ user?.name || 'Guest' }}</strong></div>
         <div class="detail-item"><span>Email address</span><strong>{{ user?.email || 'No email' }}</strong></div>
         <div class="detail-item"><span>Mobile number</span><strong>{{ user?.mobile || 'Not provided' }}</strong></div>
         <div class="detail-item"><span>Registered</span><strong>{{ user?.registeredAt || 'Unknown' }}</strong></div>
       </div>
 
+      <form class="profile-edit-form" *ngIf="editing" (ngSubmit)="saveProfile()">
+        <label>Full name<input name="profileName" [(ngModel)]="user.name" required /></label>
+        <label>Email address<input name="profileEmail" [value]="user.email" disabled /></label>
+        <label>Mobile number<input name="profileMobile" [(ngModel)]="user.mobile" placeholder="+919876543210" /></label>
+        <label>Department<input name="profileDepartment" [(ngModel)]="user.departmentId" placeholder="Department name" /></label>
+        <label>Role<select name="profileRole" [(ngModel)]="user.role"><option *ngFor="let role of roles" [value]="role">{{ role }}</option></select></label>
+        <button class="primary-action" type="submit">Save profile</button>
+      </form>
+
       <div class="security-note">
         <span class="security-icon">✓</span>
         <div><strong>Account security</strong><p>Keep your contact details current for sign-in and verification messages.</p></div>
       </div>
+      <p class="profile-message" *ngIf="message" aria-live="polite">{{ message }}</p>
 
       <div class="profile-actions">
         <button class="primary-action" type="button" (click)="goToDashboard()">Open dashboard</button>

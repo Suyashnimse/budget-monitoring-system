@@ -14,6 +14,16 @@
           <span class="user-avatar">{{ (loggedInUser.name || loggedInUser.email).charAt(0).toUpperCase() }}</span>
           <span class="user-name">{{ loggedInUser.name || loggedInUser.email }}</span>
         </div>
+        <div class="official-emblems" aria-label="Government reference emblems">
+          <div class="emblem-card">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_India.svg" alt="Government of India emblem" />
+            <span>Government of India</span>
+          </div>
+          <div class="emblem-card">
+            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Maharashtra.svg" alt="Government of Maharashtra emblem" />
+            <span>Government of Maharashtra</span>
+          </div>
+        </div>
       </header>
 
       <nav class="header-nav" aria-label="Primary sections">

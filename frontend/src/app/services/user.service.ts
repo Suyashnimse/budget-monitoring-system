@@ -30,6 +30,12 @@ export class UserService {
     return this.http.post(`${this.apiUrl}/api/users`, user);
   }
 
+  updateProfile(profile: any) {
+    return this.http.put(`${this.apiUrl}/api/users/profile`, profile, {
+      headers: { Authorization: `Bearer ${localStorage.getItem('token') || ''}` }
+    });
+  }
+
   requestRegistrationOtp(email: string, mobile: string) {
     return this.http.post(`${this.apiUrl}/api/otp/request`, { email, mobile });
   }

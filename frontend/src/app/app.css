@@ -186,6 +186,29 @@
 .user-avatar { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 50%; background: #d89b2b; color: #fff; }
 .user-name { color: var(--muted); font-size: 0.9rem; }
 
+.official-emblems {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  justify-content: flex-end;
+}
+
+.emblem-card {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  color: #355467;
+  font-size: .68rem;
+  font-weight: 750;
+  max-width: 145px;
+}
+
+.emblem-card img {
+  width: 36px;
+  height: 42px;
+  object-fit: contain;
+}
+
 .header-nav {
   display: flex;
   align-items: center;
@@ -616,6 +639,8 @@ button:hover {
     margin-left: 0;
     padding: 22px 16px 32px;
   }
+
+  .official-emblems { justify-content: flex-start; width: 100%; }
 
   .page-overlay { position: fixed; top: 178px; right: 16px; }
 

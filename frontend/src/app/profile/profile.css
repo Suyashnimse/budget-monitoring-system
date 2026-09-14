@@ -16,6 +16,7 @@
 .section-title { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; border-bottom: 1px solid #e2e8f0; padding-bottom: 1rem; }
 .section-title h3 { margin: .3rem 0 0; color: #0f2435; }
 .verified-label { color: #0f766e; background: #eaf5f2; }
+.edit-button { border: 1px solid #b9d8d2; border-radius: 6px; background: #fff; color: #0f766e; cursor: pointer; font: inherit; font-size: .8rem; font-weight: 750; padding: .55rem .7rem; }
 .details-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1.25rem 0; }
 .detail-item { border: 1px solid #e2e8f0; border-radius: 8px; padding: .85rem; }
 .detail-item span { display: block; color: #64748b; font-size: .76rem; margin-bottom: .35rem; }
@@ -24,8 +25,12 @@
 .security-icon { display: grid; place-items: center; flex: 0 0 26px; height: 26px; border-radius: 50%; background: #0f766e; color: #fff; font-weight: 800; }
 .security-note strong { color: #0f766e; }
 .security-note p { color: #64748b; font-size: .85rem; margin: .25rem 0 0; }
+.profile-edit-form { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; padding: 1.25rem 0; }
+.profile-edit-form label { display: grid; gap: .4rem; color: #334155; font-size: .82rem; font-weight: 700; }
+.profile-edit-form input, .profile-edit-form select { box-sizing: border-box; width: 100%; border: 1px solid #cbd5e1; border-radius: 7px; font: inherit; padding: .7rem; }
+.profile-message { color: #0f766e; font-weight: 700; }
 .profile-actions { display: flex; gap: .7rem; flex-wrap: wrap; margin-top: 1.25rem; }
 .profile-actions button { border: 0; border-radius: 6px; cursor: pointer; font: inherit; font-weight: 700; padding: .75rem 1rem; }
 .primary-action { background: #0f766e; color: #fff; }
 .profile-actions .logout-btn { background: #fff1f2; color: #be123c; }
-@media (max-width: 760px) { .profile-heading { align-items: flex-start; flex-direction: column; } .profile-layout { grid-template-columns: 1fr; } .details-grid { grid-template-columns: 1fr; } }
+@media (max-width: 760px) { .profile-heading { align-items: flex-start; flex-direction: column; } .profile-layout { grid-template-columns: 1fr; } .details-grid, .profile-edit-form { grid-template-columns: 1fr; } }
