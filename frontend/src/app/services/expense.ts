@@ -6,15 +6,15 @@ import { environment } from '../../environments/environment';
   providedIn: 'root'
 })
 export class ExpenseService {
-  private readonly apiUrl = environment.apiBaseUrl;
+  private readonly apiUrl = `${environment.apiBaseUrl}/api/expense`;
 
   constructor(private http: HttpClient) {}
 
   getExpenses() {
-    return this.http.get(this.apiUrl + '/expense');
+    return this.http.get<any[]>(this.apiUrl);
   }
 
   createExpense(data: any) {
-    return this.http.post(this.apiUrl + '/expense/add', data);
+    return this.http.post(`${this.apiUrl}/add`, data);
   }
 }

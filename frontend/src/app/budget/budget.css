@@ -1,34 +1,41 @@
-.card {
-  max-width: 520px;
-  margin: 2rem auto;
-  padding: 1.5rem;
-  border: 1px solid #ddd;
-  border-radius: 10px;
-  background: #fff;
-}
-
-.form-group {
-  display: flex;
-  flex-direction: column;
-  margin-bottom: 1rem;
-}
-
-label {
-  margin-bottom: 0.4rem;
-  font-weight: 600;
-}
-
-input {
-  padding: 0.6rem;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-button {
-  padding: 0.7rem 1rem;
-  border: none;
-  border-radius: 6px;
-  background: #2563eb;
-  color: white;
-  cursor: pointer;
-}
+.budget-page { display: grid; gap: 1.25rem; padding: 1rem 0 2rem; }
+.budget-heading, .section-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; }
+.budget-heading h2 { margin: .25rem 0 .4rem; color: #0f2435; font-size: 1.85rem; }
+.budget-heading p:not(.eyebrow) { margin: 0; color: #64748b; }
+.eyebrow { color: #0f766e; font-size: .74rem; font-weight: 800; letter-spacing: .08em; margin: 0; text-transform: uppercase; }
+.year-range, .record-count, .required-note { color: #0f766e; font-size: .8rem; font-weight: 750; white-space: nowrap; }
+.state-filter { display: grid; gap: .35rem; color: #475569; font-size: .78rem; font-weight: 750; min-width: 210px; }
+.state-filter select { border: 1px solid #b9d8d2; border-radius: 7px; color: #0f766e; font: inherit; padding: .6rem .7rem; }
+.card { padding: 1.4rem; border: 1px solid #d8e2e9; border-radius: 12px; background: #fff; box-shadow: 0 10px 25px rgba(15, 36, 53, .06); }
+.summary-grid { display: grid; gap: 1rem; grid-template-columns: repeat(3, 1fr); }
+.summary-card { display: flex; flex-direction: column; gap: .3rem; border: 1px solid #d8e2e9; border-radius: 10px; padding: 1.1rem 1.2rem; background: #fff; }
+.summary-card span { color: #64748b; font-size: .82rem; font-weight: 700; text-transform: uppercase; }
+.summary-card strong { color: #0f2435; font-size: 1.45rem; }
+.summary-card small { color: #94a3b8; }
+.summary-card.total { border-top: 4px solid #0f766e; }
+.summary-card.pending { border-top: 4px solid #d89b2b; }
+.summary-card.records { border-top: 4px solid #3b82a0; }
+.section-heading { align-items: center; margin-bottom: 1.2rem; }
+.section-heading h3 { margin: .3rem 0 0; color: #0f2435; }
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 0 1rem; }
+.wide-field { grid-column: 1 / -1; }
+.form-group { display: flex; flex-direction: column; margin-bottom: 1rem; }
+label { margin-bottom: .4rem; color: #334155; font-size: .86rem; font-weight: 700; }
+input, textarea, select { box-sizing: border-box; width: 100%; padding: .72rem; border: 1px solid #cbd5e1; border-radius: 7px; background: #fff; font: inherit; }
+input:focus, textarea:focus, select:focus { border-color: #0f766e; outline: 3px solid rgba(15,118,110,.12); }
+.submit-button { border: 0; border-radius: 6px; background: #0f766e; color: #fff; cursor: pointer; font: inherit; font-weight: 750; padding: .78rem 1.1rem; }
+.message { color: #0f766e; font-weight: 650; }
+.budget-item { display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; border-top: 1px solid #e2e8f0; padding: 1.15rem 0; }
+.budget-item h4 { margin: 0 0 .35rem; color: #0f2435; }
+.budget-item p { margin: 0 0 .65rem; color: #64748b; }
+.record-meta { display: flex; flex-wrap: wrap; gap: .45rem; color: #64748b; font-size: .78rem; }
+.record-meta span { border-radius: 999px; background: #f1f5f9; padding: .25rem .5rem; }
+.budget-meta { display: flex; flex-direction: column; align-items: flex-end; gap: .45rem; }
+.budget-meta > strong { color: #0f766e; font-size: 1.1rem; white-space: nowrap; }
+.budget-meta button { border: 0; border-radius: 5px; background: #166534; color: #fff; cursor: pointer; padding: .55rem .75rem; }
+.review-note { color: #64748b; font-size: .76rem; white-space: nowrap; }
+.status-badge { border-radius: 999px; background: #e2e8f0; color: #334155; font-size: .75rem; font-weight: 750; padding: .3rem .6rem; white-space: nowrap; }
+.status-badge.pending { background: #fef3c7; color: #92400e; }
+.status-badge.approved { background: #dcfce7; color: #166534; }
+.status-badge.rejected { background: #fee2e2; color: #991b1b; }
+@media (max-width: 720px) { .budget-heading { align-items: flex-start; flex-direction: column; } .summary-grid, .form-grid { grid-template-columns: 1fr; } .wide-field { grid-column: auto; } .budget-item { align-items: flex-start; flex-direction: column; } .budget-meta { align-items: flex-start; flex-direction: row; flex-wrap: wrap; } }

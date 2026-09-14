@@ -1,9 +1,14 @@
 <div class="card dashboard-card">
-  <h2>Dashboard</h2>
-  <p>Overview of your current financial status.</p>
+  <div class="dashboard-header">
+    <div>
+      <h2>Finance Control Center</h2>
+      <p>Real-time view of budget performance across the organization.</p>
+    </div>
+    <div class="status-pill"><span class="live-dot"></span> Live · {{ lastUpdated | date:'shortTime' }}</div>
+  </div>
 
   <div class="summary-grid">
-    <div class="summary-item">
+    <div class="summary-item highlight">
       <div class="label">Total Budget</div>
       <div class="value">₹{{ totalBudget }}</div>
     </div>
@@ -28,21 +33,34 @@
   <div class="charts-grid">
     <div class="chart-card">
       <h3>Budget Used</h3>
-      <div class="chart-placeholder">Budget Used</div>
+      <div class="donut-chart" [style.--progress]="utilizationPercent + '%'">
+        <strong>{{ utilizationPercent | number:'1.0-1' }}%</strong>
+        <span>used</span>
+      </div>
     </div>
     <div class="chart-card">
       <h3>Budget Remaining</h3>
-      <div class="chart-placeholder">Budget Remaining</div>
+      <div class="remaining-figure">₹{{ totalBudget - totalExpense | number }}</div>
+      <div class="progress-track"><span [style.width.%]="100 - utilizationPercent"></span></div>
+      <small>Available for approved public programs</small>
     </div>
-    <div class="chart-card">
-      <div class="chart-placeholder">Monthly Spending Trend</div>
+    <div class="chart-card wide">
       <h3>Monthly Spending Trend</h3>
+      <div class="trend-bars" aria-label="Monthly spending trend">
+        <span style="height: 34%"></span><span style="height: 48%"></span><span style="height: 42%"></span><span style="height: 64%"></span><span style="height: 58%"></span><span style="height: 78%"></span><span style="height: 70%"></span><span style="height: 88%"></span>
+      </div>
+      <div class="trend-labels"><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span></div>
     </div>
   </div>
 
   <div class="alerts-section">
     <h3>Department-wise Utilization</h3>
-    <div class="chart-placeholder">Finance: 52.5% · Education: 40% · Health: 70%</div>
+    <div class="department-bars">
+      <div><label>Finance <b>52.5%</b></label><span><i style="width: 52.5%"></i></span></div>
+      <div><label>Education <b>40%</b></label><span><i style="width: 40%"></i></span></div>
+      <div><label>Health <b>70%</b></label><span><i style="width: 70%"></i></span></div>
+      <div><label>Operations <b>68%</b></label><span><i style="width: 68%"></i></span></div>
+    </div>
   </div>
 
   <div class="alerts-section">

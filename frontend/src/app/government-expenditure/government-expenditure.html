@@ -1,0 +1,42 @@
+<section class="expenditure-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">Citizen view</p>
+      <h2>Government Expenditure Archive</h2>
+      <p>Compare source-backed allocations and actual spending by financial year. Every record shows its source and verification status.</p>
+    </div>
+    <label class="year-filter" for="archiveYear">Financial year
+      <select id="archiveYear" [(ngModel)]="selectedYear" (change)="loadRecords()">
+        <option *ngFor="let year of yearOptions" [value]="year">{{ year === 'All years' ? year : 'FY ' + year + '-' + (+year + 1) }}</option>
+      </select>
+    </label>
+  </header>
+
+  <section class="summary-grid">
+    <div><span>Allocated</span><strong>{{ formatAmount(summary.allocatedAmount) }}</strong></div>
+    <div><span>Actual expenditure</span><strong>{{ formatAmount(summary.actualAmount) }}</strong></div>
+    <div><span>Unspent variance</span><strong>{{ formatAmount(summary.variance) }}</strong></div>
+  </section>
+
+  <section class="archive-panel">
+    <p class="message" *ngIf="message">{{ message }}</p>
+    <div class="table-wrap" *ngIf="records.length">
+      <table>
+        <thead>
+          <tr><th>Year</th><th>Department</th><th>Category</th><th>Allocated</th><th>Actual</th><th>Status</th><th>Source</th></tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let record of records">
+            <td>{{ record.financialYear }}</td>
+            <td>{{ record.department }}</td>
+            <td>{{ record.category }}</td>
+            <td>{{ formatAmount(record.allocatedAmount) }}</td>
+            <td>{{ formatAmount(record.actualAmount) }}</td>
+            <td><span class="status" [class.verified]="record.dataStatus === 'Verified official'">{{ record.dataStatus }}</span></td>
+            <td>{{ record.source }}<a *ngIf="record.sourceUrl" [href]="record.sourceUrl" target="_blank" rel="noopener">Open source</a></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</section>

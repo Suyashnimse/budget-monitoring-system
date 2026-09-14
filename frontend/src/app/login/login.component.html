@@ -1,18 +1,88 @@
-<div class="card">
-  <h2>Welcome back</h2>
-  <p>Sign in to track your budgets, spending, and alerts.</p>
+<div class="login-shell">
+  <div class="login-panel">
+    <div class="login-hero">
+      <div class="brand-mark">BC</div>
+      <h1>Jan Dhan Budget Monitoring System</h1>
+      <p>Secure access for finance teams, department leads, and operations admins.</p>
+      <ul>
+        <li>Real-time budget visibility</li>
+        <li>Protected financial approvals</li>
+        <li>Clear team accountability</li>
+      </ul>
+    </div>
 
-  <form (ngSubmit)="login()">
-    <label>Email</label>
-    <br>
-    <input type="email" placeholder="Email" [(ngModel)]="email" name="email">
-    <br><br>
+    <div class="login-card">
+      <div class="brand-block">
+        <div class="mini-brand">
+          <div class="brand-mark">BC</div>
+          <div>
+            <h2>Welcome back</h2>
+            <p>Access your business planning workspace.</p>
+          </div>
+        </div>
+      </div>
 
-    <label>Password</label>
-    <br>
-    <input type="password" placeholder="Password" [(ngModel)]="password" name="password">
-    <br><br>
+      <div class="toggle-row">
+        <button type="button" [class.active]="!isRegistering" (click)="showLogin()">Login</button>
+        <button type="button" [class.active]="isRegistering" (click)="showRegister()">Create Account</button>
+      </div>
 
-    <button type="submit">Login</button>
-  </form>
+      <div class="social-row">
+        <div #googleButton class="google-button" aria-label="Continue with Google"></div>
+      </div>
+
+      <div class="divider"><span>or use your email</span></div>
+
+      <form *ngIf="!isRegistering" (ngSubmit)="login()">
+        <label for="email">Email</label>
+        <input id="email" type="email" placeholder="Enter your email" [(ngModel)]="email" name="email" />
+
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input id="password" [type]="showPassword ? 'text' : 'password'" placeholder="Enter your password" [(ngModel)]="password" name="password" />
+          <button type="button" class="ghost-btn" (click)="showPassword = !showPassword">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+
+        <button type="submit">Sign In</button>
+      </form>
+
+      <form *ngIf="isRegistering" (ngSubmit)="register()">
+        <label for="name">Full Name</label>
+        <input id="name" name="name" [(ngModel)]="name" placeholder="Enter your name" required />
+
+        <label for="emailReg">Email</label>
+        <input id="emailReg" name="emailReg" type="email" [(ngModel)]="email" placeholder="you@example.com" required />
+
+        <label for="mobile">Mobile Number</label>
+        <input id="mobile" name="mobile" [(ngModel)]="mobile" placeholder="Enter mobile number" required />
+
+        <div class="otp-box">
+          <label for="otp">OTP Verification</label>
+          <input id="otp" name="otp" [(ngModel)]="otp" placeholder="Enter OTP" />
+          <button type="button" class="otp-btn" (click)="sendOtp()">Send OTP</button>
+          <p class="otp-message" *ngIf="otpMessage">{{ otpMessage }}</p>
+        </div>
+
+        <label for="passwordReg">Password</label>
+        <div class="password-field">
+          <input id="passwordReg" name="passwordReg" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="Choose a password" required />
+          <button type="button" class="ghost-btn" (click)="showPassword = !showPassword">
+            {{ showPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+
+        <label for="confirmPassword">Confirm Password</label>
+        <div class="password-field">
+          <input id="confirmPassword" name="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" placeholder="Re-enter password" required />
+          <button type="button" class="ghost-btn" (click)="showConfirmPassword = !showConfirmPassword">
+            {{ showConfirmPassword ? 'Hide' : 'Show' }}
+          </button>
+        </div>
+
+        <button type="submit">Create Account</button>
+      </form>
+    </div>
+  </div>
 </div>

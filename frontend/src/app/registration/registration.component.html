@@ -1,0 +1,49 @@
+<section class="auth-card">
+  <h2>Create an account</h2>
+  <p>Register to start managing budgets and expenses.</p>
+
+  <form (ngSubmit)="register()">
+    <label for="name">Full Name</label>
+    <input id="name" name="name" [(ngModel)]="name" placeholder="Enter your name" required />
+
+    <label for="email">Email</label>
+    <input id="email" name="email" type="email" [(ngModel)]="email" placeholder="you@example.com" required />
+
+    <label for="mobile">Mobile Number</label>
+    <input id="mobile" name="mobile" [(ngModel)]="mobile" placeholder="Enter mobile number" required />
+
+    <label for="photo">Profile Photo</label>
+    <input id="photo" name="photo" type="file" (change)="onPhotoSelected($event)" accept="image/*" />
+
+    <label for="password">Password</label>
+    <input id="password" name="password" type="password" [(ngModel)]="password" placeholder="Choose a password" required />
+
+    <label for="confirmPassword">Confirm Password</label>
+    <input id="confirmPassword" name="confirmPassword" type="password" [(ngModel)]="confirmPassword" placeholder="Re-enter password" required />
+
+    <div class="otp-box">
+      <p class="privacy-note">For account security, separate codes will be sent to your email and mobile number. Both must be verified.</p>
+      <button type="button" class="otp-btn" (click)="sendOtp()" [disabled]="sendingOtp">{{ sendingOtp ? 'Sending...' : 'Send email and SMS codes' }}</button>
+
+      <label for="emailOtp">Email verification code</label>
+      <div class="otp-line">
+        <input id="emailOtp" name="emailOtp" [(ngModel)]="emailOtp" inputmode="numeric" maxlength="6" placeholder="6-digit email code" />
+        <button type="button" class="verify-btn" (click)="verifyOtp('email')" [disabled]="emailVerified">{{ emailVerified ? 'Verified' : 'Verify email' }}</button>
+      </div>
+
+      <label for="mobileOtp">Mobile verification code</label>
+      <div class="otp-line">
+        <input id="mobileOtp" name="mobileOtp" [(ngModel)]="mobileOtp" inputmode="numeric" maxlength="6" placeholder="6-digit SMS code" />
+        <button type="button" class="verify-btn" (click)="verifyOtp('mobile')" [disabled]="mobileVerified">{{ mobileVerified ? 'Verified' : 'Verify mobile' }}</button>
+      </div>
+      <p class="otp-message" *ngIf="otpMessage" aria-live="polite">{{ otpMessage }}</p>
+    </div>
+
+    <button type="submit">Register</button>
+  </form>
+
+  <p class="switch-link">
+    Already have an account?
+    <a routerLink="/login">Login</a>
+  </p>
+</section>

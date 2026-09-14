@@ -1,0 +1,94 @@
+> [debug] [2026-08-11T15:21:53.777Z] Found config in file "C:\Users\SHREE\OneDrive\Desktop\Budget-Monitoring-System\frontend\vercel.json"
+Vercel CLI 58.9.1 (Node.js 24.18.0)
+> [debug] [2026-08-11T15:21:53.799Z] Agent/TTY/nonInteractive: isAgent=true agentName=github_copilot_vscode_agent stdin.isTTY=true --non-interactive=false explicitFalse=false => nonInteractive=false
+> [debug] [2026-08-11T15:21:53.800Z] user supplied a possible target for deployment or an extension
+> [debug] [2026-08-11T15:21:53.914Z] failed to find extension command with name "vercel---prod"
+> [debug] [2026-08-11T15:21:54.190Z] Setting target to production
+> [debug] [2026-08-11T15:21:54.203Z] Found ".vercel\repo.json" - detected "C:\Users\SHREE\OneDrive\Desktop\Budget-Monitoring-System" as repo root
+> [debug] [2026-08-11T15:21:54.206Z] Read local config from root directory (frontend)
+> [debug] [2026-08-11T15:21:54.924Z] Spinner invoked (Deploying budget-monitoring-system) with a 0ms delay
+> [debug] [2026-08-11T15:21:54.930Z] Valid access token, skipping token refresh.
+[client-debug] 2026-08-11T15:21:54.931Z Creating deployment...
+[client-debug] 2026-08-11T15:21:54.931Z Provided 'path' is a directory.
+> [debug] [2026-08-11T15:21:54.980Z] #1 ΓåÆ GET https://api.vercel.com/v9/projects/prj_nBVnUPXbscwNdOez3BTT2YQAUsf6?teamId=team_MkbDNwj5HdujF86G8xExPVri
+[client-debug] 2026-08-11T15:21:54.983Z Found 26 rules in .vercelignore
+[client-debug] 2026-08-11T15:21:54.983Z Building file tree...
+[client-debug] 2026-08-11T15:21:55.015Z Found 220 files in the specified directory
+[client-debug] 2026-08-11T15:21:55.090Z Yielding a 'hashes-calculated' event with 199 hashes
+[client-debug] 2026-08-11T15:21:55.096Z Using provided API URL: https://api.vercel.com
+[client-debug] 2026-08-11T15:21:55.096Z Using provided user agent: vercel 58.9.1 node-v24.18.0 win32 (x64)
+[client-debug] 2026-08-11T15:21:55.096Z Setting platform version to harcoded value 2
+[client-debug] 2026-08-11T15:21:55.096Z Creating the deployment and starting upload...
+[client-debug] 2026-08-11T15:21:55.097Z Determining necessary files for upload...
+[client-debug] 2026-08-11T15:21:55.098Z Creating deployment
+[client-debug] 2026-08-11T15:21:55.102Z Sending deployment creation API request
+> [debug] [2026-08-11T15:21:55.974Z] #1 ΓåÉ 200 OK: sfo1::dgds7-1786461700595-37258d7c33fa [993ms]
+[client-debug] 2026-08-11T15:21:56.133Z Deployment response: {"error":{"code":"missing_files","message":"Missing files","missing":["d94248c9073d9a76e3a72a0605461f1ebe533e42"]}}
+[client-debug] 2026-08-11T15:21:56.133Z Error: Deployment request status is 400
+[client-debug] 2026-08-11T15:21:56.133Z 1 files are required to upload
+[client-debug] 2026-08-11T15:21:56.134Z Yielding a 'file-count' event
+> [debug] [2026-08-11T15:21:56.134Z] Total files 199, 1 changed
+> [debug] [2026-08-11T15:21:56.135Z] Spinner invoked (Uploading [--------------------] (0.0B/1.5KB)) with a 0ms delay
+[client-debug] 2026-08-11T15:21:56.135Z Building an upload list...
+[client-debug] 2026-08-11T15:21:56.137Z Starting upload
+[client-debug] 2026-08-11T15:21:56.138Z POST https://api.vercel.com/v2/files?teamId=team_MkbDNwj5HdujF86G8xExPVri
+> [debug] [2026-08-11T15:21:56.142Z] Spinner invoked (Uploading [====================] (1.5KB/1.5KB)) with a 0ms delay
+[client-debug] 2026-08-11T15:21:56.551Z DONE in 413ms: POST https://api.vercel.com/v2/files?teamId=team_MkbDNwj5HdujF86G8xExPVri
+[client-debug] 2026-08-11T15:21:56.552Z File d94248c9073d9a76e3a72a0605461f1ebe533e42 (C:\Users\SHREE\OneDrive\Desktop\Budget-Monitoring-System\frontend\vercel-debug.txt) uploaded
+[client-debug] 2026-08-11T15:21:56.552Z Yielding a 'file-uploaded' event
+> [debug] [2026-08-11T15:21:56.552Z] Uploaded: C:\Users\SHREE\OneDrive\Desktop\Budget-Monitoring-System\frontend\vercel-debug.txt (1.54KB)
+[client-debug] 2026-08-11T15:21:56.552Z All files uploaded
+[client-debug] 2026-08-11T15:21:56.552Z Yielding a 'all-files-uploaded' event
+[client-debug] 2026-08-11T15:21:56.552Z Starting deployment creation
+[client-debug] 2026-08-11T15:21:56.552Z Creating deployment
+[client-debug] 2026-08-11T15:21:56.556Z Sending deployment creation API request
+[client-debug] 2026-08-11T15:21:58.349Z Deployment response: {"alias":["budget-monitoring-system-budget-monitoring-system.vercel.app","budget-monitoring-system-suyashnimse-budget-monitoring-system.vercel.app"],"aliasAssigned":false,"automaticAliases":["budget-monitoring-system-budget-monitoring-system.vercel.app","budget-monitoring-system-suyashnimse-budget-monitoring-system.vercel.app"],"bootedAt":1786461702820,"buildingAt":1786461702820,"buildSkipped":false,"createdAt":1786461702820,"creator":{"uid":"uZTB7CXzVYxghggQst9DwcC8","username":"suyashnimse"},"id":"dpl_3DDgeYG9VHKWUENtEr85BB3e9bRC","name":"budget-monitoring-system","meta":{"githubCommitAuthorName":"suyash Nimse","githubCommitAuthorEmail":"suyashnimse196@gmail.com","githubCommitMessage":"Point frontend to Render backend for production deployment","githubCommitOrg":"Suyashnimse","githubCommitRef":"main","githubCommitRepo":"budget-monitoring-system","githubCommitSha":"142cd73b10a6d54190b2f409cb951a4c68c6b3b4","githubDeployment":"1","githubOrg":"Suyashnimse","githubRepo":"budget-monitoring-system","gitDirty":"1","gitRootDirectory":"frontend","actor":"github_copilot_vscode_agent"},"originCacheRegion":"iad1","project":{"id":"prj_nBVnUPXbscwNdOez3BTT2YQAUsf6","name":"budget-monitoring-system","framework":"angular"},"public":false,"readyState":"INITIALIZING","regions":["iad1"],"source":"cli","status":"INITIALIZING","target":"production","team":{"id":"team_MkbDNwj5HdujF86G8xExPVri","name":"budget-monitoring-system","slug":"budget-monitoring-system"},"type":"LAMBDAS","url":"budget-monitoring-system-dap1qlzbo-budget-monitoring-system.vercel.app","version":2,"previewCommentsEnabled":true,"oidcTokenClaims":{"sub":"owner:budget-monitoring-system:project:budget-monitoring-system:environment:production","iss":"https://oidc.vercel.com/budget-monitoring-system","scope":"owner:budget-monitoring-system:project:budget-monitoring-system:environment:production","aud":"https://vercel.com/budget-monitoring-system","owner":"budget-monitoring-system","owner_id":"team_MkbDNwj5HdujF86G8xExPVri","project":"budget-monitoring-system","project_id":"prj_nBVnUPXbscwNdOez3BTT2YQAUsf6","environment":"production","plan":"hobby"},"lambdas":[{"id":"bld_14dqlvlrj","createdAt":1786461702450,"entrypoint":".","readyState":"READY","readyStateAt":1786461702450,"output":[]}],"aliasAssignedAt":null,"build":{"env":[]},"builds":[{"src":"package.json","use":"@vercel/static-build","config":{"distDir":"dist/frontend"}}],"createdIn":"sfo1","env":[],"functions":null,"inspectorUrl":"https://vercel.com/budget-monitoring-system/budget-monitoring-system/3DDgeYG9VHKWUENtEr85BB3e9bRC","isInConcurrentBuildsQueue":false,"isInSystemBuildsQueue":true,"ownerId":"team_MkbDNwj5HdujF86G8xExPVri","plan":"hobby","projectId":"prj_nBVnUPXbscwNdOez3BTT2YQAUsf6","resourceConfig":{"buildMachine":{"defaultPurchaseType":"basic","purchaseType":"basic","machineSelectionType":"fixed"}},"projectSettings":{"buildCommand":"ng build","devCommand":null,"commandForIgnoringBuildStep":null,"installCommand":"npm install","outputDirectory":"dist/frontend","speedInsights":{"id":"Aen8g6nyHHoPdAXRBBa6vNlJBG9","hasData":false},"webAnalytics":{"id":"OFoqlNdequeit1TRLoY0Ghobt"},"nodeVersion":"24.x"},"routes":[{"handle":"filesystem"},{"src":"^(?:/(.*))$","dest":"/index.html","check":true}],"config":{"version":1,"secureComputePrimaryRegion":null,"secureComputeFallbackRegion":null,"functionTimeout":300,"functionType":"fluid","functionMemoryType":"standard","isUsingActiveCPU":true,"resourceConfig":{"buildMachine":{"defaultPurchaseType":"basic","purchaseType":"basic","machineSelectionType":"fixed"},"buildQueue":{"configuration":"SKIP_NAMESPACE_QUEUE"}}},"attribution":{"commitMeta":{"name":"suyash Nimse","email":"suyashnimse196@gmail.com","isVerified":false}}}
+[client-debug] 2026-08-11T15:21:58.350Z Deployment created with a warning:  Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings
+[client-debug] 2026-08-11T15:21:58.350Z Yielding a 'warning' event
+[client-debug] 2026-08-11T15:21:58.350Z Deployment created
+[client-debug] 2026-08-11T15:21:58.350Z Yielding a 'created' event
+  Inspect         https://vercel.com/budget-monitoring-system/budget-monitoring-system/3DDgeYG9VHKWUENtEr85BB3e9bRC
+  Production      https://budget-monitoring-system-dap1qlzbo-budget-monitoring-system.vercel.app
+> [debug] [2026-08-11T15:21:58.352Z] Spinner invoked (BuildingΓÇª) with a 0ms delay
+> [debug] [2026-08-11T15:21:58.353Z] #2 ΓåÆ GET https://api.vercel.com/v3/now/deployments/dpl_3DDgeYG9VHKWUENtEr85BB3e9bRC/events?direction=forward&follow=1&format=lines&teamId=team_MkbDNwj5HdujF86G8xExPVri
+[client-debug] 2026-08-11T15:21:58.354Z Waiting for deployment to be ready...
+[client-debug] 2026-08-11T15:21:58.354Z Waiting for builds and the deployment to complete...
+> [debug] [2026-08-11T15:22:01.375Z] #2 ΓåÉ 200 OK: sfo1::rjwbc-1786461703335-467425fb7b5e [3.02s]
+> [debug] [2026-08-11T15:22:01.431Z] Spinner invoked (Running build in Washington, D.C., USA (East) ΓÇô iad1) with a 0ms delay
+> [debug] [2026-08-11T15:22:01.431Z] Spinner invoked (Build machine configuration: 2 cores, 8 GB) with a 0ms delay
+> [debug] [2026-08-11T15:22:01.431Z] Spinner invoked (Retrieving list of deployment files...) with a 0ms delay
+[client-debug] 2026-08-11T15:22:02.048Z Deployment state changed to BUILDING
+[client-debug] 2026-08-11T15:22:02.048Z Yielding a 'building' event
+> [debug] [2026-08-11T15:22:02.048Z] Spinner invoked (Retrieving list of deployment files...) with a 0ms delay
+> [debug] [2026-08-11T15:22:03.036Z] Spinner invoked (Downloading 220 deployment files...) with a 0ms delay
+> [debug] [2026-08-11T15:22:04.781Z] Spinner invoked (Restored build cache from previous deployment (12QaPUrWfkdeTCg7d9PptySJ6L8N)) with a 0ms delay
+> [debug] [2026-08-11T15:22:04.781Z] Spinner invoked (Warning: "vercel" found in project dependencies and will be ignored.) with a 0ms delay
+> [debug] [2026-08-11T15:22:04.781Z] Spinner invoked (Running "vercel build") with a 0ms delay
+> [debug] [2026-08-11T15:22:04.781Z] Spinner invoked (Vercel CLI 58.1.0) with a 0ms delay
+> [debug] [2026-08-11T15:22:04.782Z] Spinner invoked (WARNING! Due to `builds` existing in your configuration file, the Build and Development Settings defined in your Project Settings will not apply. Learn More: https://vercel.link/unused-build-settings) with a 0ms delay
+[client-debug] 2026-08-11T15:22:06.886Z Yielding a 'error' event
+> [debug] [2026-08-11T15:22:06.905Z] Error: Error: Command "npm install" exited with 1
+Error: Command "npm install" exited with 1
+    at Now.handleDeploymentError (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/chunks/chunk-GCSUBTKN.js:1655:12)
+    at processDeployment (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/chunks/chunk-GCSUBTKN.js:1422:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Now.create (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/chunks/chunk-GCSUBTKN.js:1547:24)
+    at async createDeploy (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/commands/deploy/index.js:197:12)
+    at async handleDefaultDeploy (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/commands/deploy/index.js:1646:18)
+    at async _Span.trace (C:\Users\SHREE\OneDrive\Desktop\Budget-Monitoring-System\frontend\node_modules\@vercel\build-utils\dist\index.js:36311:14)
+    at async main (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/index.js:2322:18)
+> [debug] [2026-08-11T15:22:06.905Z] handling error: Error: Command "npm install" exited with 1
+    at Now.handleDeploymentError (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/chunks/chunk-GCSUBTKN.js:1655:12)
+    at processDeployment (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/chunks/chunk-GCSUBTKN.js:1422:33)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+    at async Now.create (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/chunks/chunk-GCSUBTKN.js:1547:24)
+    at async createDeploy (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/commands/deploy/index.js:197:12)
+    at async handleDefaultDeploy (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/commands/deploy/index.js:1646:18)
+    at async _Span.trace (C:\Users\SHREE\OneDrive\Desktop\Budget-Monitoring-System\frontend\node_modules\@vercel\build-utils\dist\index.js:36311:14)
+    at async main (file:///C:/Users/SHREE/OneDrive/Desktop/Budget-Monitoring-System/frontend/node_modules/vercel/dist/index.js:2322:18)
+Error: Command "npm install" exited with 1
+> [debug] [2026-08-11T15:22:07.953Z] Vercel CLI 58.9.1 (Node.js 24.18.0)
+
+> [debug] [2026-08-11T15:22:08.938Z] Telemetry subprocess killed due to timeout
+> [debug] [2026-08-11T15:22:08.982Z] Telemetry subprocess exited with code null
+https://budget-monitoring-system-dap1qlzbo-budget-monitoring-system.vercel.app

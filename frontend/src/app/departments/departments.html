@@ -1,0 +1,43 @@
+<section class="departments-page">
+  <header class="page-heading">
+    <div>
+      <p class="eyebrow">Public finance administration</p>
+      <h2>Government Departments</h2>
+      <p>Manage ministries, departments, and public bodies used in budget allocation.</p>
+    </div>
+    <span class="record-count">{{ departments.length }} departments</span>
+  </header>
+
+  <section class="department-layout">
+    <form class="panel" (ngSubmit)="saveDepartment()">
+      <h3>Add department</h3>
+      <label for="departmentName">Department name</label>
+      <input id="departmentName" name="departmentName" [(ngModel)]="department.name" placeholder="Ministry of Health and Family Welfare" required />
+
+      <label for="departmentCode">Short code</label>
+      <input id="departmentCode" name="departmentCode" [(ngModel)]="department.code" placeholder="MOHFW" maxlength="12" required />
+
+      <label for="departmentDescription">Public mandate</label>
+      <textarea id="departmentDescription" name="departmentDescription" [(ngModel)]="department.description" rows="4" placeholder="Describe the department's public responsibility."></textarea>
+
+      <button type="submit">Add department</button>
+      <p class="message" *ngIf="message" aria-live="polite">{{ message }}</p>
+    </form>
+
+    <section class="panel directory-panel">
+      <div class="panel-heading">
+        <h3>Department directory</h3>
+        <span *ngIf="loading">Loading...</span>
+      </div>
+      <div class="empty-state" *ngIf="!loading && !departments.length">No departments found.</div>
+      <article class="department-row" *ngFor="let item of departments">
+        <div>
+          <strong>{{ item.name }}</strong>
+          <span class="code">{{ item.code }}</span>
+          <p>{{ item.description || 'No mandate description added.' }}</p>
+        </div>
+        <button class="remove-button" type="button" (click)="removeDepartment(item._id)">Remove</button>
+      </article>
+    </section>
+  </section>
+</section>

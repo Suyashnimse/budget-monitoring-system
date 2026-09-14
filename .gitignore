@@ -17,3 +17,5 @@ backend/uploads/
 .vscode/
 .DS_Store
 *.log
+.vercel
+.env*

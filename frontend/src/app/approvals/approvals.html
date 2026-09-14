@@ -1,0 +1,51 @@
+<section class="approvals-page">
+  <header class="approval-heading">
+    <div><p class="eyebrow">Constitutional authority workflow</p><h2>Budget approvals</h2><p>Only registered CM, DCM, MLA, PM, MP, Minister, and Minister of State authorities can approve or reject a public budget.</p></div>
+    <span class="authority-count">{{ authorities.length }} authorities registered</span>
+  </header>
+
+  <section class="card authority-workspace">
+    <div class="authority-card">
+      <div class="section-heading"><div><p class="eyebrow">Authority selection</p><h3>Select approving official</h3></div><span class="role-chip">CM · DCM · MLA · PM · MP · Ministers</span></div>
+      <div class="authority-picker">
+        <label for="authorityLookup">Find official authority</label>
+        <input id="authorityLookup" name="authorityLookup" type="search" [(ngModel)]="authorityLookup" placeholder="Search by name, role, ID, or constituency" />
+        <select name="registeredAuthority" [(ngModel)]="selectedAuthorityId" size="5">
+          <option *ngFor="let member of selectableAuthorities" [value]="member.authorityId">{{ member.name }} · {{ member.role }} · {{ member.constituency }}</option>
+        </select>
+      </div>
+      <div class="selected-authority-card" *ngIf="selectedAuthority">
+        <div class="authority-avatar">{{ selectedAuthority.role }}</div>
+        <div><strong>{{ selectedAuthority.name }}</strong><p>{{ selectedAuthority.role }} · Authority ID: {{ selectedAuthority.authorityId }}</p><p>{{ selectedAuthority.constituency }}{{ selectedAuthority.constituencyNumber ? ' · No. ' + selectedAuthority.constituencyNumber : '' }} · {{ selectedAuthority.state }}</p><small>{{ selectedAuthority.ministry || 'Ministry/department not provided' }}</small></div>
+      </div>
+      <p class="message" *ngIf="message" aria-live="polite">{{ message }}</p>
+    </div>
+
+    <div class="authority-list">
+      <div class="section-heading"><div><p class="eyebrow">Authorized members</p><h3>Authority directory</h3></div></div>
+      <div class="directory-filters">
+        <input type="search" name="authoritySearch" [(ngModel)]="authoritySearch" placeholder="Search official name, ID, constituency..." />
+        <select name="roleFilter" [(ngModel)]="selectedRole"><option *ngFor="let role of authorityRoles" [value]="role">{{ role }}</option></select>
+        <select name="stateFilter" [(ngModel)]="selectedState"><option *ngFor="let state of authorityStates" [value]="state">{{ state }}</option></select>
+      </div>
+      <div class="authority-table-wrap" *ngIf="filteredAuthorities.length">
+        <table class="authority-table">
+          <thead><tr><th>Official name</th><th>Role</th><th>Authority ID</th><th>Constituency</th><th>No.</th><th>State</th><th>Ministry / department</th></tr></thead>
+          <tbody><tr *ngFor="let member of filteredAuthorities" (click)="selectAuthority(member)" [class.selected-authority]="selectedAuthorityId === member.authorityId"><td><strong>{{ member.name }}</strong></td><td><span class="authority-avatar">{{ member.role }}</span></td><td>{{ member.authorityId }}</td><td>{{ member.constituency }}</td><td>{{ member.constituencyNumber || '—' }}</td><td>{{ member.state }}</td><td>{{ member.ministry || 'Public authority' }}</td></tr></tbody>
+        </table>
+      </div>
+      <p class="empty" *ngIf="!filteredAuthorities.length">No authority matches your search.</p>
+    </div>
+  </section>
+
+  <section class="card decisions-card">
+    <div class="decision-toolbar">
+      <div><p class="eyebrow">Decision queue</p><h3>Review budget requests</h3></div>
+      <label class="authority-select">Acting authority<select [(ngModel)]="selectedAuthorityId" name="selectedAuthorityId"><option value="">Select authority</option><option *ngFor="let member of authorities" [value]="member.authorityId">{{ member.authorityId }} · {{ member.name }} ({{ member.role }})</option></select></label>
+      <label class="status-filter">Status<select [(ngModel)]="selectedStatus" name="statusFilter"><option value="All">All</option><option value="Pending Approval">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></label>
+    </div>
+
+    <article class="approval-item" *ngFor="let item of filteredApprovals"><div class="request-info"><span class="request-department">{{ item.department }} · FY {{ item.financialYear }}</span><h3>{{ item.title || item.department + ' Budget' }}</h3><p>{{ item.description || 'No details provided.' }}</p><small>Source: {{ item.source || 'Department submission' }}</small><div class="approval-history" *ngIf="item.approval?.authorityId">Last action: {{ item.approval.authorityName }} ({{ item.approval.authorityRole }}) · {{ item.approval.authorityId }}</div></div><div class="approval-actions"><strong class="amount">₹{{ item.allocatedAmount | number }}</strong><span class="status-pill" [class.pending]="item.status === 'Pending Approval'" [class.approved]="item.status === 'Approved'" [class.rejected]="item.status === 'Rejected'">{{ item.status }}</span><div *ngIf="item.status === 'Pending Approval'" class="decision-buttons"><button type="button" class="approve" (click)="approve(item)">Approve</button><button type="button" class="reject" (click)="reject(item)">Reject</button></div></div></article>
+    <p class="empty" *ngIf="!filteredApprovals.length">No budget requests match this filter.</p>
+  </section>
+</section>

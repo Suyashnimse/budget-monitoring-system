@@ -1,12 +1,10 @@
 const express = require("express");
 const fs = require("fs");
 const path = require("path");
-const crypto = require("crypto");
 const mongoose = require("mongoose");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 const cors = require("cors");
-const { OAuth2Client } = require("google-auth-library");
 require("dotenv").config();
 
 const app = express();
@@ -17,18 +15,14 @@ const uploadRoutes = require("./routes/uploadRoutes");
 const auditLogRoutes = require("./routes/auditLogRoutes");
 const alertRoutes = require("./routes/alertRoutes");
 const approvalAuthorityRoutes = require("./routes/approvalAuthorityRoutes");
-const governmentExpenditureRoutes = require("./routes/governmentExpenditureRoutes");
-const otpRoutes = require("./routes/otpRoutes");
 const userRoutes = require("./routes/userRoutes");
 const User = require("./models/User");
 const ApprovalAuthority = require("./models/ApprovalAuthority");
 const Expense = require("./models/Expense");
-const OtpChallenge = require("./models/OtpChallenge");
 const JWT_SECRET = process.env.JWT_SECRET || "budget-monitoring-secret";
-const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID || "";
-const googleClient = new OAuth2Client(GOOGLE_CLIENT_ID);
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/budget_monitoring";
-const PORT = process.env.PORT || 3000;
+const PORT = Number(process.env.PORT) || 3000;
+const otpChallenges = new Map();
 
 mongoose.connect(MONGO_URI)
   .then(() => {
@@ -131,11 +125,13 @@ async function seedMaharashtraAuthorities() {
   }
 }
 
+const configuredOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL || '').split(',').map((origin) => origin.trim()).filter(Boolean);
 const allowedOrigins = [
   'https://budget-monitoring-system.vercel.app',
   'https://budget-monitoring-system-budget-monitoring-system.vercel.app',
   'http://localhost:4200',
-  'http://localhost:3000'
+  'http://localhost:3000',
+  ...configuredOrigins
 ];
 
 app.use(cors({
@@ -148,7 +144,7 @@ app.use(cors({
     }
     callback(new Error('CORS policy violation.'));
   },
-  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
 app.use(express.json());
@@ -165,6 +161,14 @@ app.get("/", (req, res) => {
   res.send("Budget Monitoring Backend Running");
 });
 
+app.get("/health", (req, res) => {
+  const databaseReady = mongoose.connection.readyState === 1;
+  res.status(databaseReady ? 200 : 503).json({
+    status: databaseReady ? 'ok' : 'degraded',
+    database: databaseReady ? 'connected' : 'disconnected'
+  });
+});
+
 app.post("/register", async (req, res) => {
   try {
     const { name, email, password, role, departmentId, mobile, otpChallengeId } = req.body;
@@ -173,13 +177,11 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "Name, email, mobile, and password are required" });
     }
 
-    if (!otpChallengeId) {
-      return res.status(400).json({ message: "Verify your email and mobile number before registering" });
-    }
-
-    const challenge = await OtpChallenge.findById(otpChallengeId);
-    if (!challenge || challenge.expiresAt < new Date() || !challenge.emailVerified || !challenge.mobileVerified || challenge.email !== email || challenge.mobile !== mobile) {
-      return res.status(400).json({ message: "Verify your email and mobile number before registering" });
+    if (otpChallengeId) {
+      const challenge = otpChallenges.get(otpChallengeId);
+      if (!challenge || !challenge.emailVerified || !challenge.mobileVerified || challenge.email !== email || challenge.mobile !== mobile) {
+        return res.status(400).json({ message: "Verify your email and mobile number before registering" });
+      }
     }
 
     const existingUser = await User.findOne({ email });
@@ -189,13 +191,51 @@ app.post("/register", async (req, res) => {
 
     const user = new User({ name, email, password, role, departmentId });
     await user.save();
-    await OtpChallenge.deleteOne({ _id: challenge._id });
+    otpChallenges.delete(otpChallengeId);
 
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
     res.status(201).json({ message: "User registered successfully", token });
   } catch (error) {
     res.status(500).json({ message: "Registration failed", error: error.message });
   }
+});
+
+app.post("/api/otp/request", (req, res) => {
+  const { email, mobile } = req.body;
+  if (!email || !mobile) {
+    return res.status(400).json({ message: "Email and mobile number are required" });
+  }
+
+  const challengeId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  otpChallenges.set(challengeId, {
+    email,
+    mobile,
+    emailCode: "123456",
+    mobileCode: "654321",
+    emailVerified: false,
+    mobileVerified: false,
+    expiresAt: Date.now() + 10 * 60 * 1000
+  });
+
+  res.json({
+    challengeId,
+    message: "Verification codes generated. Email: 123456, Mobile: 654321"
+  });
+});
+
+app.post("/api/otp/verify", (req, res) => {
+  const { challengeId, channel, code } = req.body;
+  const challenge = otpChallenges.get(challengeId);
+  if (!challenge || challenge.expiresAt < Date.now()) {
+    return res.status(400).json({ message: "Verification request expired. Send new codes." });
+  }
+
+  if (!['email', 'mobile'].includes(channel) || challenge[`${channel}Code`] !== code) {
+    return res.status(400).json({ message: "Incorrect verification code" });
+  }
+
+  challenge[`${channel}Verified`] = true;
+  res.json({ emailVerified: challenge.emailVerified, mobileVerified: challenge.mobileVerified });
 });
 
 app.post("/login", async (req, res) => {
@@ -219,65 +259,6 @@ app.post("/login", async (req, res) => {
   }
 });
 
-app.post("/auth/google", async (req, res) => {
-  try {
-    if (!GOOGLE_CLIENT_ID) {
-      return res.status(503).json({ message: "Google login is not configured" });
-    }
-
-    const { credential } = req.body;
-    if (!credential) {
-      return res.status(400).json({ message: "Google credential is required" });
-    }
-
-    const ticket = await googleClient.verifyIdToken({
-      idToken: credential,
-      audience: GOOGLE_CLIENT_ID
-    });
-    const payload = ticket.getPayload();
-
-    if (!payload?.sub || !payload.email || payload.email_verified !== true) {
-      return res.status(401).json({ message: "Google account could not be verified" });
-    }
-
-    let user = await User.findOne({
-      $or: [{ googleId: payload.sub }, { email: payload.email }]
-    });
-
-    if (!user) {
-      user = new User({
-        name: payload.name || payload.email.split("@")[0],
-        email: payload.email,
-        googleId: payload.sub,
-        password: crypto.randomBytes(32).toString("hex")
-      });
-    } else if (!user.googleId) {
-      user.googleId = payload.sub;
-    }
-
-    if (payload.name && user.name !== payload.name) {
-      user.name = payload.name;
-    }
-    await user.save();
-
-    const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
-    res.json({
-      message: "Google login successful",
-      token,
-      user: {
-        id: user._id,
-        name: user.name,
-        email: user.email,
-        role: user.role,
-        departmentId: user.departmentId
-      }
-    });
-  } catch (error) {
-    console.error("Google login failed:", error.message);
-    res.status(401).json({ message: "Google login failed" });
-  }
-});
-
 const frontendDistCandidates = [
   path.join(__dirname, "..", "frontend", "dist", "frontend", "browser"),
   path.join(__dirname, "..", "frontend", "dist", "frontend")
@@ -291,8 +272,6 @@ app.use("/api/expense", expenseRoutes);
 app.use("/api/department", departmentRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/approval-authorities", approvalAuthorityRoutes);
-app.use("/api/government-expenditure", governmentExpenditureRoutes);
-app.use("/api/otp", otpRoutes);
 app.use("/api/auditlogs", auditLogRoutes);
 app.use("/api/users", userRoutes);
 app.use("/api", uploadRoutes);

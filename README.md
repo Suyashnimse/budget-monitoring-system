@@ -1,7 +1,7 @@
 # AI-Based Budget Utilization Monitoring System
 
 ## Project Overview
-The AI-Based Budget Utilization Monitoring System is a web-based application developed using the MEAN Stack (MongoDB, Express.js, Angular, Node.js). The system helps government departments and enterprises monitor budget allocations, expenditures, utilization percentages, and financial anomalies in real time.
+The AI-Based Budget Utilization Monitoring System is a web-based application developed using Angular, Node.js, Express.js, and MongoDB Atlas. The system helps government departments and enterprises monitor budget allocations, expenditures, utilization percentages, and financial anomalies in real time.
 
 ## Problem Statement
 Organizations often face challenges in tracking budget utilization effectively. Manual reporting and delayed financial reviews can lead to under-utilization, overspending, and reduced transparency.
@@ -37,9 +37,9 @@ This project provides a centralized platform to monitor budget allocation and ex
 
 ### Deployment
 
-- Vercel
-- Render
-- MongoDB Atlas
+- Frontend Deployment: https://budget-monitoring-system.vercel.app
+- Backend Deployment: https://budget-monitoring-system.onrender.com
+- Database: MongoDB Atlas
 
 ## Modules
 
@@ -105,3 +105,13 @@ Start MongoDB and connect using MongoDB Compass.
 
 ## Conclusion
 The AI-Based Budget Utilization Monitoring System improves financial governance by providing real-time visibility into budget utilization, helping organizations make better financial decisions and identify irregular spending patterns early.
+
+## Deliverables
+- GitHub Repository: `https://github.com/<username>/<repository>`
+- Live Frontend (Vercel): `https://<your-frontend-app>.vercel.app`
+- Live Backend (Render): `https://<your-backend-app>.onrender.com`
+- MongoDB Atlas Database: configured in `.env`
+- IEEE Report: `documentation/IEEE_Report.pdf`
+- Presentation PPT: `documentation/Presentation.pptx`
+- Screenshots: `documentation/screenshots/`
+- Demo Video: `documentation/Demo_Video.mp4`

@@ -1,20 +1,61 @@
-<div class="app-shell">
-  <header class="topbar">
-    <h1>Budget Monitoring System</h1>
-    <nav>
-      <a routerLink="/login">Login</a>
-      <a routerLink="/dashboard">Dashboard</a>
-      <a routerLink="/users">Users</a>
-      <a routerLink="/departments">Departments</a>
-      <a routerLink="/budget">Budget Allocation</a>
-      <a routerLink="/expense">Expense Entry</a>
-      <a routerLink="/alerts">Alerts</a>
-      <a routerLink="/reports">Reports</a>
-      <a routerLink="/auditlogs">Audit Logs</a>
-    </nav>
-  </header>
+<div class="app-shell" [class.dark-mode]="darkMode" [class.menu-collapsed]="!menuOpen">
+  <ng-container *ngIf="!isAuthRoute; else authContent">
+    <main class="content">
+      <header class="pagebar">
+        <div class="header-identity">
+          <div class="header-brand-mark">JD</div>
+          <div>
+            <p class="eyebrow">Public finance workspace</p>
+            <h2 class="site-title">Jan Dhan Budget Monitoring System</h2>
+            <p class="header-subtitle">Track allocations, spending, and accountability in one place.</p>
+          </div>
+        </div>
+        <div class="header-user" *ngIf="loggedInUser">
+          <span class="user-avatar">{{ (loggedInUser.name || loggedInUser.email).charAt(0).toUpperCase() }}</span>
+          <span class="user-name">{{ loggedInUser.name || loggedInUser.email }}</span>
+        </div>
+      </header>
 
-  <main class="content">
-    <router-outlet></router-outlet>
-  </main>
+      <nav class="header-nav" aria-label="Primary sections">
+        <a routerLink="/dashboard" routerLinkActive="active-tab">Dashboard</a>
+        <a routerLink="/departments" routerLinkActive="active-tab">Departments</a>
+        <a routerLink="/budget" routerLinkActive="active-tab">Budgets</a>
+        <a routerLink="/expense" routerLinkActive="active-tab">Expenses</a>
+        <a routerLink="/approvals" routerLinkActive="active-tab">Approvals</a>
+        <div class="menu-wrap">
+          <button class="menu-button create-button" type="button" (click)="toggleCreateMenu()" [attr.aria-expanded]="createMenuOpen" aria-haspopup="true">+ Create</button>
+        </div>
+        <div class="menu-wrap">
+          <button class="menu-button" type="button" (click)="toggleDropdown()" [attr.aria-expanded]="dropdownOpen" aria-haspopup="true">Menu</button>
+        </div>
+        <button class="theme-button" type="button" (click)="toggleTheme()">{{ darkMode ? 'Light' : 'Dark' }}</button>
+      </nav>
+
+      <div class="page-overlay create-overlay" *ngIf="createMenuOpen">
+        <p>Create</p>
+        <a routerLink="/budget" (click)="closeMenus()">Create Budget</a>
+        <a routerLink="/expense" (click)="closeMenus()">Add Expense</a>
+        <a routerLink="/users" (click)="closeMenus()">Create User</a>
+        <a routerLink="/departments" (click)="closeMenus()">Create Department</a>
+      </div>
+
+      <div class="page-overlay menu-overlay" *ngIf="dropdownOpen">
+        <p>Menu</p>
+        <a routerLink="/government-expenditure" (click)="closeMenus()">Information</a>
+        <a routerLink="/reports" (click)="closeMenus()">Reports</a>
+          <a routerLink="/alerts" (click)="closeMenus()">Alerts</a>
+        <a routerLink="/auditlogs" (click)="closeMenus()">Audit</a>
+        <a routerLink="/users" (click)="closeMenus()">Users</a>
+        <a routerLink="/profile" (click)="closeMenus()">Profile</a>
+        <button type="button" (click)="logout()">Logout</button>
+      </div>
+      <router-outlet></router-outlet>
+    </main>
+  </ng-container>
+
+  <ng-template #authContent>
+    <main class="auth-shell">
+      <router-outlet></router-outlet>
+    </main>
+  </ng-template>
 </div>

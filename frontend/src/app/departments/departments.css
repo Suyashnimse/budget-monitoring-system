@@ -1,0 +1,53 @@
+.departments-page {
+  display: grid;
+  gap: 1.25rem;
+  padding: 1rem 0 2rem;
+}
+
+.page-heading, .panel-heading, .department-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.eyebrow, .record-count, .code, .panel-heading span {
+  color: #0f766e;
+  font-size: 0.8rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.page-heading h2, .panel h3 { margin: 0.2rem 0 0.4rem; }
+.page-heading p:not(.eyebrow) { margin: 0; color: #64748b; }
+
+.department-layout {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: minmax(260px, 0.8fr) minmax(320px, 1.2fr);
+}
+
+.panel {
+  background: #fff;
+  border: 1px solid #dbe4ea;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.06);
+  padding: 1.25rem;
+}
+
+label { display: block; font-weight: 600; margin: 1rem 0 0.35rem; }
+input, textarea { box-sizing: border-box; width: 100%; border: 1px solid #cbd5e1; border-radius: 6px; font: inherit; padding: 0.7rem; }
+button { background: #0f766e; border: 0; border-radius: 6px; color: #fff; cursor: pointer; font: inherit; font-weight: 700; margin-top: 1rem; padding: 0.7rem 1rem; }
+.message { color: #0f766e; font-weight: 600; }
+.department-row { border-top: 1px solid #e2e8f0; padding: 1rem 0; }
+.department-row strong { display: block; font-size: 1rem; }
+.department-row .code { display: inline-block; margin-top: 0.25rem; }
+.department-row p { color: #64748b; margin: 0.5rem 0 0; }
+.remove-button { background: #b91c1c; margin-top: 0; white-space: nowrap; }
+.empty-state { color: #64748b; padding: 1.5rem 0; }
+
+@media (max-width: 760px) {
+  .department-layout { grid-template-columns: 1fr; }
+  .page-heading { flex-direction: column; }
+}

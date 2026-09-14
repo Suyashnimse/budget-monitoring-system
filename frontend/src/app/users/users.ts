@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient } from '@angular/common/http';
-import { environment } from '../../environments/environment';
+import { DepartmentService } from '../services/department.service';
+import { UserService } from '../services/user.service';
 
 @Component({
   selector: 'app-users',
@@ -16,35 +16,17 @@ export class Users implements OnInit {
   user = { name: '', email: '', password: '', role: 'Admin' };
   availableRoles = ['Admin', 'Finance Officer', 'Department Head'];
   message = '';
-  private apiUrl = environment.apiBaseUrl;
 
-  constructor(private http: HttpClient) {}
+  constructor(private departmentService: DepartmentService, private userService: UserService) {}
 
   ngOnInit(): void {
-    this.seedDepartments();
     this.loadDepartments();
   }
 
-  seedDepartments() {
-    const initialDepartments = [
-      { name: 'Finance', code: 'FIN', description: 'Finance department' },
-      { name: 'Education', code: 'EDU', description: 'Education department' },
-      { name: 'Health', code: 'HLT', description: 'Health department' },
-      { name: 'Public Works', code: 'PWB', description: 'Public Works department' },
-      { name: 'Agriculture', code: 'AGR', description: 'Agriculture department' }
-    ];
-
-    initialDepartments.forEach((department) => {
-      this.http.post(this.apiUrl + '/department/add', department).subscribe({
-        error: () => {}
-      });
-    });
-  }
-
   loadDepartments() {
-    this.http.get<any[]>(this.apiUrl + '/department').subscribe({
-      next: (data) => this.departments = data,
-      error: () => this.message = 'Unable to load departments.'
+    this.departmentService.getDepartments().subscribe({
+      next: (departments: any) => this.departments = departments || [],
+      error: () => this.message = 'Unable to load departments from the backend.'
     });
   }
 
@@ -54,15 +36,9 @@ export class Users implements OnInit {
       return;
     }
 
-    this.http.post(this.apiUrl + '/department/add', this.department).subscribe({
-      next: () => {
-        this.message = 'Department Created';
-        this.department = { name: '', code: '', description: '' };
-        this.loadDepartments();
-      },
-      error: (err) => {
-        this.message = err.error?.message === 'Department code already exists' ? 'Duplicate User' : err.error?.message || 'Database Error';
-      }
+    this.departmentService.createDepartment(this.department).subscribe({
+      next: () => { this.message = 'Department created'; this.department = { name: '', code: '', description: '' }; this.loadDepartments(); },
+      error: (error: any) => this.message = error.error?.message || 'Unable to create department.'
     });
   }
 
@@ -72,26 +48,16 @@ export class Users implements OnInit {
       return;
     }
 
-    this.http.post(this.apiUrl + '/register', this.user).subscribe({
-      next: () => {
-        this.message = `User created with role ${this.user.role}`;
-        this.user = { name: '', email: '', password: '', role: 'Admin' };
-      },
-      error: (err) => {
-        this.message = err.error?.message || 'Database Error';
-      }
+    this.userService.createUser(this.user).subscribe({
+      next: () => { this.message = `User created with role ${this.user.role}`; this.user = { name: '', email: '', password: '', role: 'Admin' }; },
+      error: (error: any) => this.message = error.error?.message || 'Unable to create user.'
     });
   }
 
   deleteDepartment(id: string) {
-    this.http.delete(`https://budget-monitoring-system.onrender.com/department/delete/${id}`).subscribe({
-      next: () => {
-        this.message = 'Department Deleted';
-        this.loadDepartments();
-      },
-      error: (err) => {
-        this.message = err.error?.message || 'Database Error';
-      }
+    this.departmentService.deleteDepartment(id).subscribe({
+      next: () => { this.message = 'Department deleted'; this.loadDepartments(); },
+      error: (error: any) => this.message = error.error?.message || 'Unable to delete department.'
     });
   }
 }

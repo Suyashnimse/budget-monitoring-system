@@ -1,0 +1,49 @@
+<section class="profile-page">
+  <header class="profile-heading">
+    <div>
+      <p class="eyebrow">Account settings</p>
+      <h2>My Profile</h2>
+      <p>Manage your identity and access to the Jan Dhan Budget Monitoring System.</p>
+    </div>
+    <span class="status-badge"><i></i> Active account</span>
+  </header>
+
+  <div class="profile-layout">
+    <section class="identity-panel">
+      <div class="profile-photo">
+        <img [src]="photoPreview || user?.photo || 'https://ui-avatars.com/api/?name=' + (user?.name || 'User') + '&background=0f766e&color=fff'" alt="Profile photo" />
+      </div>
+      <h3>{{ user?.name || 'Guest user' }}</h3>
+      <p>{{ user?.role || 'Registered user' }}</p>
+      <label class="upload-button" for="profilePhoto">Change photo</label>
+      <input id="profilePhoto" type="file" accept="image/*" (change)="onPhotoSelected($event)" />
+    </section>
+
+    <section class="details-panel">
+      <div class="section-title">
+        <div>
+          <p class="eyebrow">Personal information</p>
+          <h3>Account details</h3>
+        </div>
+        <span class="verified-label">Verified workspace</span>
+      </div>
+
+      <div class="details-grid">
+        <div class="detail-item"><span>Full name</span><strong>{{ user?.name || 'Guest' }}</strong></div>
+        <div class="detail-item"><span>Email address</span><strong>{{ user?.email || 'No email' }}</strong></div>
+        <div class="detail-item"><span>Mobile number</span><strong>{{ user?.mobile || 'Not provided' }}</strong></div>
+        <div class="detail-item"><span>Registered</span><strong>{{ user?.registeredAt || 'Unknown' }}</strong></div>
+      </div>
+
+      <div class="security-note">
+        <span class="security-icon">✓</span>
+        <div><strong>Account security</strong><p>Keep your contact details current for sign-in and verification messages.</p></div>
+      </div>
+
+      <div class="profile-actions">
+        <button class="primary-action" type="button" (click)="goToDashboard()">Open dashboard</button>
+        <button class="logout-btn" type="button" (click)="logout()">Sign out</button>
+      </div>
+    </section>
+  </div>
+</section>

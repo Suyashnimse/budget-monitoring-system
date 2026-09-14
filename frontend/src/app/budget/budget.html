@@ -1,33 +1,91 @@
-<div class="card">
-  <h2>Budget Plan</h2>
-  <p>Set and review your planned allocations for the month.</p>
-
-  <form (ngSubmit)="submitBudget()">
-    <div class="form-group">
-      <label for="financialYear">Financial Year</label>
-      <input id="financialYear" name="financialYear" [(ngModel)]="budget.financialYear" required />
-    </div>
-
-    <div class="form-group">
-      <label for="department">Department</label>
-      <select id="department" name="department" [(ngModel)]="budget.department" required>
-        <option value="">Select a department</option>
-        <option *ngFor="let department of departmentOptions" [value]="department">{{ department }}</option>
+<div class="budget-page">
+  <header class="budget-heading">
+    <div><p class="eyebrow">Allocation management</p><h2>Budget register</h2><p>Plan public allocations, record provenance, and route every submission for approval.</p></div>
+    <label class="state-filter">View state
+      <select [(ngModel)]="selectedState" name="selectedState" (change)="loadBudgets()">
+        <option *ngFor="let state of stateOptions" [value]="state">{{ state }}</option>
       </select>
+    </label>
+  </header>
+
+  <section class="summary-grid">
+    <div class="summary-card total"><span>Total allocated</span><strong>₹{{ totalBudget | number }}</strong><small>Across all departments</small></div>
+    <div class="summary-card pending"><span>Pending review</span><strong>{{ pendingApprovals }}</strong><small>Awaiting approval</small></div>
+    <div class="summary-card records"><span>Budget records</span><strong>{{ budgets.length }}</strong><small>Stored in MongoDB</small></div>
+  </section>
+
+  <section class="card form-card">
+    <div class="section-heading"><div><p class="eyebrow">New allocation</p><h3>Create budget</h3></div><span class="required-note">* Required fields</span></div>
+
+    <form (ngSubmit)="submitBudget()">
+      <div class="form-grid">
+      <div class="form-group wide-field">
+        <label for="title">Budget Title</label>
+        <input id="title" name="title" [(ngModel)]="budget.title" placeholder="National health infrastructure allocation" required />
+      </div>
+
+      <div class="form-group">
+        <label for="financialYear">Financial Year</label>
+        <select id="financialYear" name="financialYear" [(ngModel)]="budget.financialYear" required>
+          <option *ngFor="let year of yearOptions" [value]="year">FY {{ year }}-{{ year + 1 }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="state">State / Union Territory</label>
+        <select id="state" name="state" [(ngModel)]="budget.state" required>
+          <option *ngFor="let state of stateOptions" [value]="state">{{ state }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" [(ngModel)]="budget.department" required>
+          <option value="">Select a department</option>
+          <option *ngFor="let department of departmentOptions" [value]="department">{{ department }}</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label for="allocatedAmount">Allocated Amount</label>
+        <input id="allocatedAmount" name="allocatedAmount" type="number" [(ngModel)]="budget.allocatedAmount" required />
+      </div>
+
+      <div class="form-group">
+        <label for="allocationDate">Allocation date</label>
+        <input id="allocationDate" name="allocationDate" type="date" [(ngModel)]="budget.allocationDate" required />
+      </div>
+
+      <div class="form-group wide-field">
+        <label for="description">Budget Details</label>
+        <textarea id="description" name="description" rows="3" [(ngModel)]="budget.description" placeholder="Describe the purpose, expected outcome, and scope."></textarea>
+      </div>
+
+      <div class="form-group">
+        <label for="source">Data source</label>
+        <input id="source" name="source" [(ngModel)]="budget.source" placeholder="Official ministry notification or department submission" />
+      </div>
+      </div>
+
+      <button class="submit-button" type="submit">Submit for approval</button>
+    </form>
+
+    <p class="message" *ngIf="message">{{ message }}</p>
+  </section>
+
+  <section class="card list-card">
+    <div class="section-heading"><div><p class="eyebrow">Saved records</p><h3>Department budget register</h3></div><span class="record-count">{{ budgets.length }} records</span></div>
+    <div class="budget-item" *ngFor="let item of budgets">
+      <div>
+        <h4>{{ item.title || item.department + ' Budget' }}</h4>
+        <p>{{ item.description || 'No details added yet.' }}</p>
+        <div class="record-meta"><span>{{ item.state || 'All India' }}</span><span>{{ item.department }}</span><span>FY {{ item.financialYear }}–{{ +item.financialYear + 1 }}</span><span>Source: {{ item.source || 'Department submission' }}</span></div>
+      </div>
+      <div class="budget-meta">
+        <strong>₹{{ item.allocatedAmount | number }}</strong>
+        <span class="status-badge" [class.pending]="item.status === 'Pending Approval'" [class.approved]="item.status === 'Approved'" [class.rejected]="item.status === 'Rejected'">{{ item.status || 'Pending Approval' }}</span>
+        <span class="review-note">Review in Approvals</span>
+      </div>
     </div>
-
-    <div class="form-group">
-      <label for="allocatedAmount">Allocated Amount</label>
-      <input id="allocatedAmount" name="allocatedAmount" type="number" [(ngModel)]="budget.allocatedAmount" required />
-    </div>
-
-    <div class="form-group">
-      <label for="allocationDate">Allocation Date</label>
-      <input id="allocationDate" name="allocationDate" type="date" [(ngModel)]="budget.allocationDate" required />
-    </div>
-
-    <button type="submit">Save</button>
-  </form>
-
-  <p *ngIf="message">{{ message }}</p>
+  </section>
 </div>

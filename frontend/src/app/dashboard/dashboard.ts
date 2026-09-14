@@ -1,30 +1,37 @@
-import { Component, OnInit } from '@angular/core';
-import { NgIf } from '@angular/common';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { DatePipe, DecimalPipe, NgIf } from '@angular/common';
 import { BudgetService } from '../services/budget';
 import { ExpenseService } from '../services/expense';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [NgIf],
+  imports: [DatePipe, DecimalPipe, NgIf],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.css',
 })
-export class Dashboard implements OnInit {
+export class Dashboard implements OnDestroy, OnInit {
   totalBudget = 8000000;
   totalExpense = 4200000;
   utilizationPercent = 52.5;
   totalAlerts = 3;
   alert = '';
   recentExpenseAverage = 0;
+  lastUpdated = new Date();
+  private refreshTimer?: ReturnType<typeof setInterval>;
 
   constructor(private budgetService: BudgetService, private expenseService: ExpenseService) {}
 
   ngOnInit(): void {
     this.loadSummary();
-    window.addEventListener('expense-updated', () => this.loadSummary());
+    this.refreshTimer = setInterval(() => this.loadSummary(), 30000);
+  }
+
+  ngOnDestroy(): void {
+    if (this.refreshTimer) clearInterval(this.refreshTimer);
   }
 
   loadSummary() {
+    this.lastUpdated = new Date();
     this.budgetService.getBudgets().subscribe({
       next: (budgets: any) => {
         this.totalBudget = budgets.reduce((sum: number, item: any) => sum + (item.allocatedAmount || 0), 0);

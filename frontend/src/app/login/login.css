@@ -1,0 +1,287 @@
+.login-shell {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+}
+
+.login-panel {
+  width: 100%;
+  max-width: 1080px;
+  display: grid;
+  grid-template-columns: 1.1fr 0.9fr;
+  border-radius: 28px;
+  overflow: hidden;
+  box-shadow: 0 25px 60px rgba(15, 23, 42, 0.16);
+}
+
+.login-hero {
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  color: white;
+  padding: 2.4rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand-mark {
+  width: 48px;
+  height: 48px;
+  display: grid;
+  place-items: center;
+  border-radius: 14px;
+  background: rgba(255,255,255,0.15);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+.login-hero h1 {
+  margin: 0 0 0.5rem;
+  font-size: 1.9rem;
+}
+
+.login-hero p {
+  margin: 0 0 1rem;
+  color: #bfdbfe;
+  line-height: 1.6;
+}
+
+.login-hero ul {
+  padding-left: 1.2rem;
+  margin: 0;
+  color: #e0f2fe;
+  display: grid;
+  gap: 0.45rem;
+}
+
+.login-card {
+  background: white;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.brand-block h2 {
+  margin: 0 0 0.35rem;
+  font-size: 1.6rem;
+  color: #0f172a;
+}
+
+.mini-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 0.5rem;
+}
+
+.mini-brand .brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 10px;
+  background: #dbeafe;
+  color: #1d4ed8;
+  font-size: 0.95rem;
+  margin-bottom: 0;
+}
+
+.brand-block p {
+  margin: 0 0 1rem;
+  color: #475569;
+  line-height: 1.5;
+}
+
+.toggle-row {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 0.75rem;
+}
+
+.toggle-row button {
+  flex: 1;
+  padding: 0.7rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  background: #f8fafc;
+  color: #334155;
+  cursor: pointer;
+}
+
+.toggle-row button.active {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+.social-row {
+  display: grid;
+  gap: 0.6rem;
+  margin-bottom: 0.75rem;
+}
+
+.google-button {
+  display: flex;
+  justify-content: center;
+  min-height: 44px;
+}
+
+.social-btn {
+  margin-top: 0;
+  background: #ffffff;
+  color: #0f172a;
+  border: 1px solid #dbe4f0;
+  box-shadow: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.social-btn.alt {
+  background: #f8fafc;
+}
+
+.social-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+}
+
+.social-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.divider {
+  text-align: center;
+  margin: 0.2rem 0 0.8rem;
+  color: #64748b;
+  font-size: 0.9rem;
+  position: relative;
+}
+
+.divider::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: #e2e8f0;
+  z-index: 0;
+}
+
+.divider span {
+  position: relative;
+  background: white;
+  padding: 0 10px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  animation: fadeIn 0.25s ease;
+}
+
+label {
+  font-weight: 600;
+  color: #334155;
+}
+
+input {
+  width: 100%;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 10px;
+  font-size: 1rem;
+  outline: none;
+  box-sizing: border-box;
+}
+
+.password-field {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.password-field input {
+  flex: 1;
+}
+
+.ghost-btn {
+  margin-top: 0;
+  padding: 0.7rem 0.8rem;
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+  font-weight: 600;
+}
+
+input:focus {
+  border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+}
+
+button {
+  margin-top: 0.5rem;
+  padding: 0.9rem 1rem;
+  border: none;
+  border-radius: 10px;
+  background: linear-gradient(90deg, #2563eb, #3b82f6);
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+button:hover {
+  transform: translateY(-1px);
+}
+
+.login-hero {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.otp-box {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.otp-btn {
+  width: fit-content;
+  padding: 0.6rem 0.8rem;
+  background: #0f766e;
+}
+
+@media (max-width: 900px) {
+  .login-panel {
+    grid-template-columns: 1fr;
+  }
+}

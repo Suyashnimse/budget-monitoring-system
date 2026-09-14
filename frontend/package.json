@@ -10,24 +10,37 @@
   },
   "private": true,
   "packageManager": "npm@11.16.0",
+  "overrides": {
+    "stream-to-promise": "^3.0.0",
+    "tar": "^7.5.22",
+    "uuid": "^14.0.1"
+  },
   "dependencies": {
-    "@angular/common": "^22.0.0",
-    "@angular/compiler": "^22.0.0",
-    "@angular/core": "^22.0.0",
-    "@angular/forms": "^22.0.0",
-    "@angular/platform-browser": "^22.0.0",
-    "@angular/router": "^22.0.0",
+    "@angular/common": "^22.1.1",
+    "@angular/compiler": "^22.1.1",
+    "@angular/core": "^22.1.1",
+    "@angular/forms": "^22.1.1",
+    "@angular/platform-browser": "^22.1.1",
+    "@angular/router": "^22.1.1",
+    "@angular/service-worker": "^22.1.1",
+    "@capacitor/android": "^8.5.0",
+    "@capacitor/core": "^8.5.0",
     "chart.js": "^4.5.1",
+    "jspdf": "^4.2.1",
+    "ng2-charts": "^10.0.0",
     "rxjs": "~7.8.0",
-    "tslib": "^2.3.0"
+    "tslib": "^2.3.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
-    "@angular/build": "^22.0.5",
-    "@angular/cli": "^22.0.5",
-    "@angular/compiler-cli": "^22.0.0",
+    "@angular/build": "^22.1.1",
+    "@angular/cli": "^22.1.1",
+    "@angular/compiler-cli": "^22.1.1",
+    "@capacitor/cli": "^8.5.0",
     "jsdom": "^28.0.0",
     "prettier": "^3.8.1",
     "typescript": "~6.0.2",
+    "vercel": "^58.9.1",
     "vitest": "^4.0.8"
   }
 }

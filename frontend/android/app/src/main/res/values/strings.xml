@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">budget-monitoring-system</string>
+    <string name="title_activity_main">budget-monitoring-system</string>
+    <string name="package_name">com.suyashnimse.budgetmonitoring</string>
+    <string name="custom_url_scheme">com.suyashnimse.budgetmonitoring</string>
+</resources>
