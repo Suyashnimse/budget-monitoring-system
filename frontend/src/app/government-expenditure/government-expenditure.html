@@ -2,36 +2,37 @@
   <header class="page-heading">
     <div>
       <p class="eyebrow">Citizen view</p>
-      <h2>Government Expenditure Archive</h2>
-      <p>Compare source-backed allocations and actual spending by financial year. Every record shows its source and verification status.</p>
+      <h2>All Department Budget Archive</h2>
+      <p>Every Rupee. Every Record. Everyone Can See.</p>
     </div>
-    <label class="year-filter" for="archiveYear">Financial year
-      <select id="archiveYear" [(ngModel)]="selectedYear" (change)="loadRecords()">
-        <option *ngFor="let year of yearOptions" [value]="year">{{ year === 'All years' ? year : 'FY ' + year + '-' + (+year + 1) }}</option>
-      </select>
-    </label>
+    <div class="archive-filters">
+      <label for="archiveYear">Financial year<select id="archiveYear" [(ngModel)]="selectedYear" (change)="loadRecords()"><option *ngFor="let year of yearOptions" [value]="year">{{ year === 'All years' ? year : 'FY ' + year }}</option></select></label>
+      <label for="archiveGovernment">Government<select id="archiveGovernment" [(ngModel)]="selectedGovernmentLevel" (change)="loadRecords()"><option *ngFor="let level of governmentLevels" [value]="level">{{ level }}</option></select></label>
+      <label for="archiveMeasure">Measure<select id="archiveMeasure" [(ngModel)]="selectedEstimateType" (change)="loadRecords()"><option *ngFor="let type of estimateTypes" [value]="type">{{ type }}</option></select></label>
+    </div>
   </header>
 
   <section class="summary-grid">
-    <div><span>Allocated</span><strong>{{ formatAmount(summary.allocatedAmount) }}</strong></div>
-    <div><span>Actual expenditure</span><strong>{{ formatAmount(summary.actualAmount) }}</strong></div>
-    <div><span>Unspent variance</span><strong>{{ formatAmount(summary.variance) }}</strong></div>
+    <div><span>Actual</span><strong>₹{{ formatAmount(summary['Actual']) }}</strong><small>INR crore</small></div>
+    <div><span>Budget estimate</span><strong>₹{{ formatAmount(summary['Budget Estimate']) }}</strong><small>INR crore</small></div>
+    <div><span>Revised estimate</span><strong>₹{{ formatAmount(summary['Revised Estimate']) }}</strong><small>INR crore</small></div>
   </section>
 
   <section class="archive-panel">
+    <p class="coverage-note">Imported Union demand totals currently cover FY 2022–23 Actuals; FY 2023–24 Actuals, BE, and RE; FY 2024–25 BE and RE; and FY 2025–26 BE. The 2025–26 Drinking Water workbook is unavailable, older years and Maharashtra figures still need extraction, and FY 2026–27 actuals are not yet available.</p>
     <p class="message" *ngIf="message">{{ message }}</p>
     <div class="table-wrap" *ngIf="records.length">
       <table>
         <thead>
-          <tr><th>Year</th><th>Department</th><th>Category</th><th>Allocated</th><th>Actual</th><th>Status</th><th>Source</th></tr>
+          <tr><th>Year</th><th>Government</th><th>Department / demand</th><th>Measure</th><th>Amount (₹ crore)</th><th>Status</th><th>Source</th></tr>
         </thead>
         <tbody>
           <tr *ngFor="let record of records">
             <td>{{ record.financialYear }}</td>
+            <td>{{ record.governmentLevel }}</td>
             <td>{{ record.department }}</td>
-            <td>{{ record.category }}</td>
-            <td>{{ formatAmount(record.allocatedAmount) }}</td>
-            <td>{{ formatAmount(record.actualAmount) }}</td>
+            <td>{{ record.estimateType }}</td>
+            <td>{{ formatAmount(record.amount) }}</td>
             <td><span class="status" [class.verified]="record.dataStatus === 'Verified official'">{{ record.dataStatus }}</span></td>
             <td>{{ record.source }}<a *ngIf="record.sourceUrl" [href]="record.sourceUrl" target="_blank" rel="noopener">Open source</a></td>
           </tr>

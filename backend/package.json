@@ -4,19 +4,26 @@
   "description": "Backend API for the Budget Monitoring System",
   "main": "server.js",
   "scripts": {
-    "start": "node server.js"
+    "start": "node server.js",
+    "import:union-budget": "node scripts/importUnionBudget.js"
   },
   "dependencies": {
     "axios": "^1.18.1",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^17.4.2",
+    "exceljs": "^4.4.0",
     "express": "^4.22.2",
     "google-auth-library": "^11.0.2",
     "jsonwebtoken": "^9.0.3",
     "mongoose": "^9.7.4",
     "multer": "^2.2.0",
-    "nodemailer": "^10.0.9"
+    "nodemailer": "^10.0.9",
+    "pdfjs-dist": "^6.3.289"
+  },
+  "overrides": {
+    "uuid": "^11.1.1"
   },
   "keywords": [],
   "author": "",

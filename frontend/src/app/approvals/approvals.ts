@@ -3,6 +3,7 @@ import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { BudgetService } from '../services/budget';
+import { environment } from '../../environments/environment';
 
 @Component({
   selector: 'app-approvals',
@@ -15,12 +16,15 @@ export class Approvals implements OnInit {
   authorities: any[] = [];
   selectedAuthorityId = '';
   authorityLookup = '';
-  authority = { name: '', role: 'CM', constituency: '', constituencyNumber: '', state: 'Maharashtra', ministry: '', contact: '', source: '', sourceUrl: '' };
+  authority = { name: '', role: '', constituency: '', constituencyNumber: '', state: 'Maharashtra', party: '', ministry: '', contact: '', source: 'User-provided manual registration', sourceUrl: '' };
   roles = ['CM', 'DCM', 'MLA', 'PM', 'MP', 'Minister', 'Minister of State'];
   selectedStatus = 'All';
   authoritySearch = '';
   selectedRole = 'All roles';
   selectedState = 'All states';
+  activeTab: 'approvals' | 'minister-departments' | 'authorized-members' = 'approvals';
+  authorityTab: 'directory' | 'register' = 'directory';
+  ministerDepartmentSearch = '';
   message = '';
   currentUser: any = null;
 
@@ -34,7 +38,7 @@ export class Approvals implements OnInit {
   }
 
   loadAuthorities() {
-    this.http.get<any>('http://localhost:3000/api/approval-authorities').subscribe({
+    this.http.get<any>(`${environment.apiBaseUrl}/api/approval-authorities`).subscribe({
       next: (data) => {
         const records = Array.isArray(data) ? data : data?.authorities;
         this.authorities = Array.isArray(records) ? records : [];
@@ -49,12 +53,12 @@ export class Approvals implements OnInit {
   }
 
   createAuthority() {
-    if (!this.authority.name || !this.authority.constituency || !this.authority.state) {
-      this.message = 'Name, constituency, and state are required.';
+    if (!this.authority.name.trim() || !this.roles.includes(this.authority.role) || !this.authority.constituency.trim() || !this.authority.state.trim()) {
+      this.message = 'Name, role, constituency, and state are required.';
       return;
     }
-    this.http.post('http://localhost:3000/api/approval-authorities', this.authority).subscribe({
-      next: () => { this.message = 'Authority registered and ID generated.'; this.authority = { name: '', role: 'CM', constituency: '', constituencyNumber: '', state: 'Maharashtra', ministry: '', contact: '', source: '', sourceUrl: '' }; this.loadAuthorities(); },
+    this.http.post(`${environment.apiBaseUrl}/api/approval-authorities`, this.authority).subscribe({
+      next: () => { this.message = 'Authority registered and ID generated.'; this.authority = { name: '', role: '', constituency: '', constituencyNumber: '', state: 'Maharashtra', party: '', ministry: '', contact: '', source: 'User-provided manual registration', sourceUrl: '' }; this.loadAuthorities(); },
       error: (error: any) => this.message = error.error?.message || 'Unable to register authority.'
     });
   }
@@ -109,12 +113,28 @@ export class Approvals implements OnInit {
   get filteredAuthorities() {
     const search = this.authoritySearch.trim().toLowerCase();
     return this.authorities.filter((member: any) => {
-      const matchesSearch = !search || [member.name, member.authorityId, member.role, member.constituency, member.constituencyNumber, member.ministry]
+      const matchesSearch = !search || [member.name, member.authorityId, member.role, member.party, member.constituency, member.constituencyNumber, member.ministry]
         .some((value) => String(value || '').toLowerCase().includes(search));
       const matchesRole = this.selectedRole === 'All roles' || member.role === this.selectedRole;
       const matchesState = this.selectedState === 'All states' || member.state === this.selectedState;
       return matchesSearch && matchesRole && matchesState;
     });
+  }
+
+  get filteredMinisterDepartments() {
+    const query = this.ministerDepartmentSearch.trim().toLowerCase();
+    const ministerRoles = ['CM', 'DCM', 'Minister', 'Minister of State'];
+    const titleLabels = ['chief minister', 'deputy chief minister', 'minister of state'];
+
+    return this.authorities
+      .filter((member: any) => ministerRoles.includes(member.role))
+      .flatMap((member: any) => String(member.ministry || '').split(';')
+        .map((department: string) => department.trim())
+        .filter((department: string) => department && !titleLabels.includes(department.toLowerCase()))
+        .map((department: string) => ({ ...member, department })))
+      .filter((assignment: any) => !query || [assignment.department, assignment.name, assignment.role, assignment.party, assignment.constituency]
+        .some((value) => String(value || '').toLowerCase().includes(query)))
+      .sort((first: any, second: any) => first.department.localeCompare(second.department) || first.name.localeCompare(second.name));
   }
 
   get authorityRoles() {
@@ -135,7 +155,7 @@ export class Approvals implements OnInit {
 
   get selectableAuthorities() {
     const query = this.authorityLookup.trim().toLowerCase();
-    return this.authorities.filter((member: any) => !query || [member.name, member.authorityId, member.role, member.constituency, member.state]
+    return this.authorities.filter((member: any) => !query || [member.name, member.authorityId, member.role, member.party, member.constituency, member.state]
       .some((value) => String(value || '').toLowerCase().includes(query)));
   }
 }

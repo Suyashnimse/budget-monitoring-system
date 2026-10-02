@@ -4,63 +4,129 @@
       <h2>Finance Control Center</h2>
       <p>Real-time view of budget performance across the organization.</p>
     </div>
-    <div class="status-pill"><span class="live-dot"></span> Live · {{ lastUpdated | date:'shortTime' }}</div>
+    <div class="dashboard-controls">
+      <label for="dashboardYear">Financial year</label>
+      <select id="dashboardYear" name="dashboardYear" [(ngModel)]="selectedYear" (ngModelChange)="selectedOfficialYear = $event; refreshSummary()">
+        <option *ngFor="let year of yearOptions" [value]="year">{{ year === 'All years' ? year : 'FY ' + year }}</option>
+      </select>
+      <div class="status-pill"><span class="live-dot"></span> Live · {{ lastUpdated | date:'shortTime' }}</div>
+    </div>
   </div>
 
   <div class="summary-grid">
     <div class="summary-item highlight">
-      <div class="label">Total Budget</div>
-      <div class="value">₹{{ totalBudget }}</div>
+      <div class="label">Total budget</div>
+      <div class="value">₹{{ officialTotalBudget | number:'1.0-2' }} Cr</div>
+      <small>Official government Budget Estimate</small>
     </div>
     <div class="summary-item">
-      <div class="label">Total Expenses</div>
-      <div class="value">₹{{ totalExpense }}</div>
+      <div class="label">Official total budget</div>
+      <div class="value">₹{{ realBudgetSummary['Budget Estimate'] | number:'1.0-0' }} Cr</div>
+      <small>Verified government archive</small>
     </div>
     <div class="summary-item">
-      <div class="label">Remaining Budget</div>
-      <div class="value">₹{{ totalBudget - totalExpense }}</div>
+      <div class="label">Official approved budget</div>
+      <div class="value">₹{{ officialBudgetAllocation | number:'1.0-2' }} Cr</div>
+      <small>Revised estimate from government source</small>
     </div>
     <div class="summary-item">
-      <div class="label">Utilization %</div>
-      <div class="value">{{ utilizationPercent }}%</div>
+      <div class="label">Approved budget</div>
+      <div class="value">₹{{ approvedBudget | number:'1.0-0' }}</div>
+      <small>Approved allocations only</small>
     </div>
     <div class="summary-item">
-      <div class="label">Active Alerts</div>
+      <div class="label">Pending requests</div>
+      <div class="value">₹{{ pendingBudget | number:'1.0-0' }}</div>
+      <small>Awaiting approval</small>
+    </div>
+    <div class="summary-item">
+      <div class="label">Rejected requests</div>
+      <div class="value">₹{{ rejectedBudget | number:'1.0-0' }}</div>
+      <small>Excluded from total budget</small>
+    </div>
+    <div class="summary-item">
+      <div class="label">Recorded expenses</div>
+      <div class="value">₹{{ totalExpense | number:'1.0-0' }}</div>
+      <small>Matched to selected year</small>
+    </div>
+    <div class="summary-item">
+      <div class="label">Remaining approved</div>
+      <div class="value">₹{{ approvedBudget - totalExpense | number:'1.0-0' }}</div>
+      <small>Approved budget less expenses</small>
+    </div>
+    <div class="summary-item">
+      <div class="label">Utilization</div>
+      <div class="value">{{ utilizationPercent | number:'1.0-1' }}%</div>
+      <small>Operational expenses / approved budget</small>
+    </div>
+    <div class="summary-item">
+      <div class="label">Official utilization</div>
+      <div class="value">{{ officialUtilizationPercent | number:'1.0-1' }}%</div>
+      <small>Government actual / revised estimate</small>
+    </div>
+    <div class="summary-item">
+      <div class="label">Active alerts</div>
       <div class="value">{{ totalAlerts }}</div>
+      <small>Based on current year filter</small>
     </div>
   </div>
 
   <div class="charts-grid">
     <div class="chart-card">
       <h3>Budget Used</h3>
-      <div class="donut-chart" [style.--progress]="utilizationPercent + '%'">
-        <strong>{{ utilizationPercent | number:'1.0-1' }}%</strong>
-        <span>used</span>
+      <div class="donut-chart" [style.--progress]="officialUtilizationPercent + '%'">
+        <strong>{{ officialUtilizationPercent | number:'1.0-1' }}%</strong>
+        <span>official actual</span>
       </div>
+      <small>Actual: ₹{{ officialBudgetUsed | number:'1.0-2' }} Cr</small>
     </div>
     <div class="chart-card">
       <h3>Budget Remaining</h3>
-      <div class="remaining-figure">₹{{ totalBudget - totalExpense | number }}</div>
-      <div class="progress-track"><span [style.width.%]="100 - utilizationPercent"></span></div>
-      <small>Available for approved public programs</small>
+      <div class="remaining-figure">₹{{ officialBudgetRemaining | number:'1.0-2' }} Cr</div>
+      <div class="progress-track"><span [style.width.%]="officialRemainingPercent"></span></div>
+      <small>Official estimate less actual expenditure</small>
     </div>
     <div class="chart-card wide">
       <h3>Monthly Spending Trend</h3>
       <div class="trend-bars" aria-label="Monthly spending trend">
-        <span style="height: 34%"></span><span style="height: 48%"></span><span style="height: 42%"></span><span style="height: 64%"></span><span style="height: 58%"></span><span style="height: 78%"></span><span style="height: 70%"></span><span style="height: 88%"></span>
+        <span *ngFor="let month of monthlySpending" [style.height.%]="month.height" [attr.title]="month.label + ': ₹' + (month.amount | number:'1.0-0')"></span>
       </div>
-      <div class="trend-labels"><span>Apr</span><span>May</span><span>Jun</span><span>Jul</span><span>Aug</span><span>Sep</span><span>Oct</span><span>Nov</span></div>
+      <div class="trend-labels"><span *ngFor="let month of monthlySpending">{{ month.label }}</span></div>
+      <small>{{ selectedYear === 'All years' ? 'Calendar months across all years' : 'Fiscal year Apr ' + selectedYear + ' – Mar ' + (+selectedYear + 1) }}</small>
     </div>
   </div>
 
   <div class="alerts-section">
     <h3>Department-wise Utilization</h3>
-    <div class="department-bars">
-      <div><label>Finance <b>52.5%</b></label><span><i style="width: 52.5%"></i></span></div>
-      <div><label>Education <b>40%</b></label><span><i style="width: 40%"></i></span></div>
-      <div><label>Health <b>70%</b></label><span><i style="width: 70%"></i></span></div>
-      <div><label>Operations <b>68%</b></label><span><i style="width: 68%"></i></span></div>
+    <div class="department-table-wrap" *ngIf="officialDepartmentUtilizationRows.length; else noDepartmentUtilization">
+      <table class="department-utilization-table">
+        <thead>
+          <tr>
+            <th>Financial year</th>
+            <th>Department</th>
+            <th>Government</th>
+            <th>Official allocation</th>
+            <th>Actual expenditure</th>
+            <th>Utilization</th>
+            <th>Source</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let department of officialDepartmentUtilizationRows">
+            <td>{{ department.financialYear }}</td>
+            <td>{{ department.department }}</td>
+            <td>{{ department.governmentLevel }}</td>
+            <td>₹{{ department.allocation | number:'1.0-2' }} Cr</td>
+            <td>₹{{ department.actual | number:'1.0-2' }} Cr</td>
+            <td><strong>{{ department.utilization | number:'1.0-1' }}%</strong></td>
+            <td><a *ngIf="department.sourceUrl" [href]="department.sourceUrl" target="_blank" rel="noopener noreferrer">Open source</a></td>
+          </tr>
+        </tbody>
+      </table>
     </div>
+    <ng-template #noDepartmentUtilization>
+      <p class="dashboard-empty">No budget records for this period.</p>
+    </ng-template>
   </div>
 
   <div class="alerts-section">
@@ -70,4 +136,55 @@
       <div class="alert-box muted">No recent alerts</div>
     </ng-template>
   </div>
+
+  <section class="official-archive-section" aria-labelledby="officialArchiveTitle">
+    <header class="official-archive-heading">
+      <div><p class="label">Source-linked historical data</p><h3 id="officialArchiveTitle">Official department budgets data</h3><p>All verified FY 2020–2026 department budget data from official government sources. Amounts are in INR crore.</p></div>
+      <div class="official-archive-filters">
+        <label>Financial year<select name="officialYear" [(ngModel)]="selectedOfficialYear" (ngModelChange)="selectedYear = $event; refreshSummary()"><option *ngFor="let year of officialYearOptions" [value]="year">{{ year === 'All years' ? year : 'FY ' + year }}</option></select></label>
+        <label>Government<select name="officialGovernment" [(ngModel)]="selectedOfficialGovernment"><option *ngFor="let government of officialGovernmentOptions" [value]="government">{{ government }}</option></select></label>
+        <label>Measure<select name="officialMeasure" [(ngModel)]="selectedOfficialMeasure"><option *ngFor="let measure of officialMeasureOptions" [value]="measure">{{ measure }}</option></select></label>
+      </div>
+    </header>
+    <p class="official-coverage-note">Source-linked official department budgets currently cover Union Government demand records from FY 2019–20 through FY 2025–26, including Actuals, Budget Estimates, and Revised Estimates where published. Maharashtra records and earlier FY 2000–01 to 2018–19 documents still require extraction. FY 2026–27 actuals are not yet available.</p>
+    <div class="official-summary-grid">
+      <div><span>Actual</span><strong>₹{{ officialEstimateSummary['Actual'] | number:'1.0-2' }} Cr</strong></div>
+      <div><span>Budget Estimate</span><strong>₹{{ officialEstimateSummary['Budget Estimate'] | number:'1.0-2' }} Cr</strong></div>
+      <div><span>Revised Estimate</span><strong>₹{{ officialEstimateSummary['Revised Estimate'] | number:'1.0-2' }} Cr</strong></div>
+    </div>
+    <div class="official-table-controls">
+      <input type="search" aria-label="Search official budget rows" name="officialDepartmentSearch" [(ngModel)]="officialDepartmentSearch" placeholder="Search department or demand" />
+      <span>{{ selectedOfficialRows.length }} records</span>
+    </div>
+
+    <div class="official-year-breakdown" *ngIf="officialYearBreakdown.length">
+      <h4>FY 2020–2026 official budget allocation</h4>
+      <div class="year-summary-grid">
+        <div *ngFor="let item of officialYearBreakdown">
+          <span>{{ item.year }}</span>
+          <strong>₹{{ item.total | number:'1.0-2' }} Cr</strong>
+          <small>Actual ₹{{ item.actual | number:'1.0-2' }} · BE ₹{{ item.budget | number:'1.0-2' }} · RE ₹{{ item.revised | number:'1.0-2' }}</small>
+        </div>
+      </div>
+    </div>
+
+    <div class="official-department-summary" *ngIf="departmentUtilizations.length">
+      <h4>Department allocation snapshot</h4>
+      <div class="department-summary-list">
+        <div *ngFor="let department of departmentUtilizations.slice(0, 10)">
+          <span>{{ department.name }}</span>
+          <strong>₹{{ department.approvedBudget | number:'1.0-2' }} Cr</strong>
+          <small>{{ department.utilization | number:'1.0-1' }}% utilization</small>
+        </div>
+      </div>
+    </div>
+
+    <p class="dashboard-empty" *ngIf="officialDataMessage">{{ officialDataMessage }}</p>
+    <div class="official-table-wrap" *ngIf="selectedOfficialRows.length">
+      <table class="official-budget-table">
+        <thead><tr><th>Fiscal year</th><th>Government</th><th>Department / demand</th><th>Measure</th><th>Amount</th><th>Source</th></tr></thead>
+        <tbody><tr *ngFor="let record of selectedOfficialRows"><td>{{ record.financialYear }}</td><td>{{ record.governmentLevel }}</td><td>{{ record.department }}</td><td>{{ record.estimateType }}</td><td>₹{{ record.amount | number:'1.0-2' }} Cr</td><td><a [href]="record.sourceUrl" target="_blank" rel="noopener noreferrer">Open official source</a></td></tr></tbody>
+      </table>
+    </div>
+  </section>
 </div>

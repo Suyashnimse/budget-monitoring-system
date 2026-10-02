@@ -7,21 +7,27 @@ router.get('/', async (req, res) => {
   try {
     const filter = {};
     if (req.query.financialYear) filter.financialYear = req.query.financialYear;
+    if (req.query.governmentLevel) filter.governmentLevel = req.query.governmentLevel;
     if (req.query.department) filter.department = req.query.department;
+    if (req.query.estimateType) filter.estimateType = req.query.estimateType;
     const records = await GovernmentExpenditure.find(filter).sort({ financialYear: -1, department: 1, category: 1 });
     const summary = records.reduce((result, record) => {
-      result.allocatedAmount += record.allocatedAmount;
-      result.actualAmount += record.actualAmount;
+      result[record.estimateType] += record.amount;
       return result;
-    }, { allocatedAmount: 0, actualAmount: 0 });
+    }, { 'Budget Estimate': 0, 'Revised Estimate': 0, Actual: 0 });
 
-    res.json({ records, summary: { ...summary, variance: summary.allocatedAmount - summary.actualAmount } });
+    res.json({ records, summary });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 });
 
 router.post('/import', async (req, res) => {
+  const importToken = process.env.GOVERNMENT_DATA_IMPORT_TOKEN;
+  if (!importToken || req.get('authorization') !== `Bearer ${importToken}`) {
+    return res.status(403).json({ message: 'Government data import is not authorized' });
+  }
+
   try {
     const records = req.body.records;
     if (!Array.isArray(records) || !records.length) {
@@ -30,10 +36,12 @@ router.post('/import', async (req, res) => {
 
     const normalized = records.map((record) => ({
       financialYear: String(record.financialYear || '').trim(),
+      governmentLevel: String(record.governmentLevel || '').trim(),
       department: String(record.department || '').trim(),
-      category: String(record.category || '').trim(),
-      allocatedAmount: Number(record.allocatedAmount),
-      actualAmount: Number(record.actualAmount),
+      category: String(record.category || 'Department net allocation').trim(),
+      estimateType: String(record.estimateType || '').trim(),
+      amount: Number(record.amount),
+      unit: String(record.unit || 'INR crore').trim(),
       source: String(record.source || '').trim(),
       sourceUrl: String(record.sourceUrl || '').trim(),
       dataStatus: record.dataStatus || 'Imported for review',
@@ -41,16 +49,30 @@ router.post('/import', async (req, res) => {
     }));
 
     const invalid = normalized.find((record) =>
-      !record.financialYear || !record.department || !record.category || !record.source ||
-      !Number.isFinite(record.allocatedAmount) || record.allocatedAmount < 0 ||
-      !Number.isFinite(record.actualAmount) || record.actualAmount < 0
+      !record.financialYear || !['Union Government', 'Maharashtra'].includes(record.governmentLevel) ||
+      !record.department || !record.category || !['Budget Estimate', 'Revised Estimate', 'Actual'].includes(record.estimateType) ||
+      !record.source || !Number.isFinite(record.amount)
     );
     if (invalid) {
-      return res.status(400).json({ message: 'Every record needs year, department, category, source, and valid non-negative amounts' });
+      return res.status(400).json({ message: 'Every record needs a year, government level, department, estimate type, source, and valid amount' });
     }
 
-    const imported = await GovernmentExpenditure.insertMany(normalized, { ordered: false });
-    res.status(201).json({ message: `${imported.length} expenditure records imported`, records: imported });
+    const operations = normalized.map((record) => ({
+      updateOne: {
+        filter: {
+          financialYear: record.financialYear,
+          governmentLevel: record.governmentLevel,
+          department: record.department,
+          category: record.category,
+          estimateType: record.estimateType,
+          sourceUrl: record.sourceUrl
+        },
+        update: { $set: record },
+        upsert: true
+      }
+    }));
+    const result = await GovernmentExpenditure.bulkWrite(operations, { ordered: false });
+    res.status(200).json({ message: 'Expenditure records imported', upserted: result.upsertedCount, updated: result.modifiedCount });
   } catch (error) {
     res.status(400).json({ message: error.message });
   }

@@ -3,9 +3,9 @@
     <div>
       <p class="eyebrow">Public finance administration</p>
       <h2>Government Departments</h2>
-      <p>Manage ministries, departments, and public bodies used in budget allocation.</p>
+      <p>Browse official Union ministries, Union departments, and Maharashtra government departments.</p>
     </div>
-    <span class="record-count">{{ departments.length }} departments</span>
+    <span class="record-count">{{ filteredDepartments.length }} departments</span>
   </header>
 
   <section class="department-layout">
@@ -17,6 +17,11 @@
       <label for="departmentCode">Short code</label>
       <input id="departmentCode" name="departmentCode" [(ngModel)]="department.code" placeholder="MOHFW" maxlength="12" required />
 
+      <label for="governmentLevel">Government level</label>
+      <select id="governmentLevel" name="governmentLevel" [(ngModel)]="department.governmentLevel" required>
+        <option *ngFor="let level of governmentLevels.slice(1)" [value]="level">{{ level }}</option>
+      </select>
+
       <label for="departmentDescription">Public mandate</label>
       <textarea id="departmentDescription" name="departmentDescription" [(ngModel)]="department.description" rows="4" placeholder="Describe the department's public responsibility."></textarea>
 
@@ -27,16 +32,22 @@
     <section class="panel directory-panel">
       <div class="panel-heading">
         <h3>Department directory</h3>
+        <input type="search" aria-label="Search government departments" name="departmentSearch" [(ngModel)]="departmentSearch" placeholder="Search department name or code" />
+        <select aria-label="Filter by government level" name="departmentLevelFilter" [(ngModel)]="selectedLevel">
+          <option *ngFor="let level of governmentLevels" [value]="level">{{ level }}</option>
+        </select>
         <span *ngIf="loading">Loading...</span>
       </div>
-      <div class="empty-state" *ngIf="!loading && !departments.length">No departments found.</div>
-      <article class="department-row" *ngFor="let item of departments">
+      <div class="empty-state" *ngIf="!loading && !filteredDepartments.length">No government departments found.</div>
+      <article class="department-row" *ngFor="let item of filteredDepartments">
         <div>
           <strong>{{ item.name }}</strong>
+          <span class="government-level">{{ item.governmentLevel }}</span>
           <span class="code">{{ item.code }}</span>
           <p>{{ item.description || 'No mandate description added.' }}</p>
+          <a *ngIf="item.sourceUrl" [href]="item.sourceUrl" target="_blank" rel="noopener noreferrer">Official directory source</a>
         </div>
-        <button class="remove-button" type="button" (click)="removeDepartment(item._id)">Remove</button>
+        <button *ngIf="!item.isOfficial" class="remove-button" type="button" (click)="removeDepartment(item._id)">Remove</button>
       </article>
     </section>
   </section>

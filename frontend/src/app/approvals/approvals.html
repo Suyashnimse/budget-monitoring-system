@@ -4,6 +4,13 @@
     <span class="authority-count">{{ authorities.length }} authorities registered</span>
   </header>
 
+  <nav class="approval-tabs" role="tablist" aria-label="Approval views">
+    <button type="button" class="approval-tab" role="tab" id="approvals-tab" aria-controls="approvals-panel" [attr.aria-selected]="activeTab === 'approvals'" [class.active]="activeTab === 'approvals'" (click)="activeTab = 'approvals'">Budget approvals</button>
+    <button type="button" class="approval-tab" role="tab" id="minister-departments-tab" aria-controls="minister-departments-panel" [attr.aria-selected]="activeTab === 'minister-departments'" [class.active]="activeTab === 'minister-departments'" (click)="activeTab = 'minister-departments'">Minister departments</button>
+    <button type="button" class="approval-tab" role="tab" id="authorized-members-tab" aria-controls="authorized-members-panel" [attr.aria-selected]="activeTab === 'authorized-members'" [class.active]="activeTab === 'authorized-members'" (click)="activeTab = 'authorized-members'">Authorized members</button>
+  </nav>
+
+  <div id="approvals-panel" role="tabpanel" aria-labelledby="approvals-tab" *ngIf="activeTab === 'approvals'">
   <section class="card authority-workspace">
     <div class="authority-card">
       <div class="section-heading"><div><p class="eyebrow">Authority selection</p><h3>Select approving official</h3></div><span class="role-chip">CM · DCM · MLA · PM · MP · Ministers</span></div>
@@ -11,41 +18,92 @@
         <label for="authorityLookup">Find official authority</label>
         <input id="authorityLookup" name="authorityLookup" type="search" [(ngModel)]="authorityLookup" placeholder="Search by name, role, ID, or constituency" />
         <select name="registeredAuthority" [(ngModel)]="selectedAuthorityId" size="5">
-          <option *ngFor="let member of selectableAuthorities" [value]="member.authorityId">{{ member.name }} · {{ member.role }} · {{ member.constituency }}</option>
+          <option *ngFor="let member of selectableAuthorities" [value]="member.authorityId">{{ member.name }} · {{ member.role }} · {{ member.party }} · {{ member.constituency }}</option>
         </select>
       </div>
       <div class="selected-authority-card" *ngIf="selectedAuthority">
         <div class="authority-avatar">{{ selectedAuthority.role }}</div>
-        <div><strong>{{ selectedAuthority.name }}</strong><p>{{ selectedAuthority.role }} · Authority ID: {{ selectedAuthority.authorityId }}</p><p>{{ selectedAuthority.constituency }}{{ selectedAuthority.constituencyNumber ? ' · No. ' + selectedAuthority.constituencyNumber : '' }} · {{ selectedAuthority.state }}</p><small>{{ selectedAuthority.ministry || 'Ministry/department not provided' }}</small></div>
+        <div><strong>{{ selectedAuthority.name }}</strong><p>{{ selectedAuthority.role }} · {{ selectedAuthority.party || 'Party not provided' }} · Authority ID: {{ selectedAuthority.authorityId }}</p><p>{{ selectedAuthority.constituency }}{{ selectedAuthority.constituencyNumber ? ' · No. ' + selectedAuthority.constituencyNumber : '' }} · {{ selectedAuthority.state }}</p><small>{{ selectedAuthority.ministry || 'Ministry/department not provided' }}</small></div>
       </div>
       <p class="message" *ngIf="message" aria-live="polite">{{ message }}</p>
     </div>
 
-    <div class="authority-list">
-      <div class="section-heading"><div><p class="eyebrow">Authorized members</p><h3>Authority directory</h3></div></div>
-      <div class="directory-filters">
-        <input type="search" name="authoritySearch" [(ngModel)]="authoritySearch" placeholder="Search official name, ID, constituency..." />
-        <select name="roleFilter" [(ngModel)]="selectedRole"><option *ngFor="let role of authorityRoles" [value]="role">{{ role }}</option></select>
-        <select name="stateFilter" [(ngModel)]="selectedState"><option *ngFor="let state of authorityStates" [value]="state">{{ state }}</option></select>
-      </div>
-      <div class="authority-table-wrap" *ngIf="filteredAuthorities.length">
-        <table class="authority-table">
-          <thead><tr><th>Official name</th><th>Role</th><th>Authority ID</th><th>Constituency</th><th>No.</th><th>State</th><th>Ministry / department</th></tr></thead>
-          <tbody><tr *ngFor="let member of filteredAuthorities" (click)="selectAuthority(member)" [class.selected-authority]="selectedAuthorityId === member.authorityId"><td><strong>{{ member.name }}</strong></td><td><span class="authority-avatar">{{ member.role }}</span></td><td>{{ member.authorityId }}</td><td>{{ member.constituency }}</td><td>{{ member.constituencyNumber || '—' }}</td><td>{{ member.state }}</td><td>{{ member.ministry || 'Public authority' }}</td></tr></tbody>
-        </table>
-      </div>
-      <p class="empty" *ngIf="!filteredAuthorities.length">No authority matches your search.</p>
-    </div>
   </section>
 
   <section class="card decisions-card">
     <div class="decision-toolbar">
       <div><p class="eyebrow">Decision queue</p><h3>Review budget requests</h3></div>
-      <label class="authority-select">Acting authority<select [(ngModel)]="selectedAuthorityId" name="selectedAuthorityId"><option value="">Select authority</option><option *ngFor="let member of authorities" [value]="member.authorityId">{{ member.authorityId }} · {{ member.name }} ({{ member.role }})</option></select></label>
+      <label class="authority-select acting-authority-select">
+        <span class="acting-authority-label">Acting authority</span>
+        <select [(ngModel)]="selectedAuthorityId" name="selectedAuthorityId">
+          <option value="">Select an authorized member</option>
+          <option *ngFor="let member of authorities" [value]="member.authorityId">{{ member.name }} · {{ member.role }} · {{ member.party }} · {{ member.constituency }}</option>
+        </select>
+        <small *ngIf="selectedAuthority">{{ selectedAuthority.role }} · {{ selectedAuthority.party || 'Party not provided' }} · {{ selectedAuthority.constituency }}{{ selectedAuthority.constituencyNumber ? ' · No. ' + selectedAuthority.constituencyNumber : '' }}</small>
+      </label>
       <label class="status-filter">Status<select [(ngModel)]="selectedStatus" name="statusFilter"><option value="All">All</option><option value="Pending Approval">Pending</option><option value="Approved">Approved</option><option value="Rejected">Rejected</option></select></label>
     </div>
 
     <article class="approval-item" *ngFor="let item of filteredApprovals"><div class="request-info"><span class="request-department">{{ item.department }} · FY {{ item.financialYear }}</span><h3>{{ item.title || item.department + ' Budget' }}</h3><p>{{ item.description || 'No details provided.' }}</p><small>Source: {{ item.source || 'Department submission' }}</small><div class="approval-history" *ngIf="item.approval?.authorityId">Last action: {{ item.approval.authorityName }} ({{ item.approval.authorityRole }}) · {{ item.approval.authorityId }}</div></div><div class="approval-actions"><strong class="amount">₹{{ item.allocatedAmount | number }}</strong><span class="status-pill" [class.pending]="item.status === 'Pending Approval'" [class.approved]="item.status === 'Approved'" [class.rejected]="item.status === 'Rejected'">{{ item.status }}</span><div *ngIf="item.status === 'Pending Approval'" class="decision-buttons"><button type="button" class="approve" (click)="approve(item)">Approve</button><button type="button" class="reject" (click)="reject(item)">Reject</button></div></div></article>
     <p class="empty" *ngIf="!filteredApprovals.length">No budget requests match this filter.</p>
+  </section>
+  </div>
+
+  <section id="authorized-members-panel" class="card authority-list" role="tabpanel" aria-labelledby="authorized-members-tab" *ngIf="activeTab === 'authorized-members'">
+    <div class="authority-subtabs" role="tablist" aria-label="Authorized member views">
+      <button type="button" class="authority-subtab" role="tab" id="authority-directory-tab" aria-controls="authority-directory-panel" [attr.aria-selected]="authorityTab === 'directory'" [class.active]="authorityTab === 'directory'" (click)="authorityTab = 'directory'">Directory</button>
+      <button type="button" class="authority-subtab" role="tab" id="authority-register-tab" aria-controls="authority-register-panel" [attr.aria-selected]="authorityTab === 'register'" [class.active]="authorityTab === 'register'" (click)="authorityTab = 'register'">Register authority</button>
+    </div>
+
+    <div id="authority-directory-panel" role="tabpanel" aria-labelledby="authority-directory-tab" *ngIf="authorityTab === 'directory'">
+      <div class="section-heading"><div><p class="eyebrow">Authorized members</p><h3>Authority directory</h3></div></div>
+      <div class="directory-filters">
+        <input type="search" aria-label="Search authorized members" name="authoritySearch" [(ngModel)]="authoritySearch" placeholder="Search name, role, party, ID, constituency, or portfolio" />
+        <select name="roleFilter" [(ngModel)]="selectedRole"><option *ngFor="let role of authorityRoles" [value]="role">{{ role }}</option></select>
+        <select name="stateFilter" [(ngModel)]="selectedState"><option *ngFor="let state of authorityStates" [value]="state">{{ state }}</option></select>
+      </div>
+      <div class="authority-table-wrap" *ngIf="filteredAuthorities.length">
+        <table class="authority-table">
+          <thead><tr><th>Official name</th><th>Role</th><th>Party</th><th>Authority ID</th><th>Constituency / status</th><th>No.</th><th>State</th><th>Ministry / department</th></tr></thead>
+          <tbody><tr *ngFor="let member of filteredAuthorities" (click)="selectAuthority(member)" [class.selected-authority]="selectedAuthorityId === member.authorityId"><td><strong>{{ member.name }}</strong></td><td><span class="authority-avatar">{{ member.role }}</span></td><td>{{ member.party || '—' }}</td><td>{{ member.authorityId }}</td><td>{{ member.constituency }}</td><td>{{ member.constituencyNumber || '—' }}</td><td>{{ member.state }}</td><td>{{ member.ministry || 'Public authority' }}</td></tr></tbody>
+        </table>
+      </div>
+      <p class="empty" *ngIf="!filteredAuthorities.length">No authority matches your search.</p>
+    </div>
+
+    <div id="authority-register-panel" class="authority-register-panel" role="tabpanel" aria-labelledby="authority-register-tab" *ngIf="authorityTab === 'register'">
+      <div class="section-heading"><div><p class="eyebrow">New authorized member</p><h3>Register authority</h3></div></div>
+      <form class="authority-registration-form" (ngSubmit)="createAuthority()">
+        <div class="form-grid">
+          <label>Full name<input type="text" name="authorityName" [(ngModel)]="authority.name" required /></label>
+          <label>Role<select name="authorityRole" [(ngModel)]="authority.role" required><option value="" disabled>Select role</option><option *ngFor="let role of roles" [value]="role">{{ role }}</option></select></label>
+          <label>Party<input type="text" name="authorityParty" [(ngModel)]="authority.party" /></label>
+          <label>Constituency or status<input type="text" name="authorityConstituency" [(ngModel)]="authority.constituency" required /></label>
+          <label>Constituency number<input type="text" name="authorityConstituencyNumber" [(ngModel)]="authority.constituencyNumber" /></label>
+          <label>State<input type="text" name="authorityState" [(ngModel)]="authority.state" required /></label>
+          <label class="wide">Departments / portfolios<input type="text" name="authorityMinistry" [(ngModel)]="authority.ministry" /></label>
+          <label>Contact<input type="text" name="authorityContact" [(ngModel)]="authority.contact" /></label>
+        </div>
+        <button type="submit" class="primary-action">Register authority</button>
+      </form>
+      <p class="message" *ngIf="message" aria-live="polite">{{ message }}</p>
+    </div>
+  </section>
+
+  <section id="minister-departments-panel" class="card minister-departments-card" role="tabpanel" aria-labelledby="minister-departments-tab" *ngIf="activeTab === 'minister-departments'">
+    <div class="section-heading">
+      <div><p class="eyebrow">Portfolio directory</p><h3>Minister departments</h3></div>
+      <span class="authority-count">{{ filteredMinisterDepartments.length }} assignments</span>
+    </div>
+    <label class="minister-department-search">Search department or minister
+      <input type="search" name="ministerDepartmentSearch" [(ngModel)]="ministerDepartmentSearch" placeholder="Search portfolio, minister, party, or constituency" />
+    </label>
+    <div class="authority-table-wrap" *ngIf="filteredMinisterDepartments.length">
+      <table class="authority-table minister-department-table">
+        <thead><tr><th>Department / portfolio</th><th>Minister</th><th>Position</th><th>Party</th><th>Constituency / status</th></tr></thead>
+        <tbody><tr *ngFor="let assignment of filteredMinisterDepartments"><td>{{ assignment.department }}</td><td><strong>{{ assignment.name }}</strong></td><td>{{ assignment.role }}</td><td>{{ assignment.party || '—' }}</td><td>{{ assignment.constituency }}{{ assignment.constituencyNumber ? ' · No. ' + assignment.constituencyNumber : '' }}</td></tr></tbody>
+      </table>
+    </div>
+    <p class="empty" *ngIf="!filteredMinisterDepartments.length">No department assignments match your search.</p>
   </section>
 </section>

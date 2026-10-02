@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
@@ -8,8 +8,11 @@ export class GovernmentExpenditureService {
 
   constructor(private http: HttpClient) {}
 
-  getRecords(financialYear = '') {
-    const query = financialYear ? `?financialYear=${encodeURIComponent(financialYear)}` : '';
-    return this.http.get<{ records: any[]; summary: { allocatedAmount: number; actualAmount: number; variance: number } }>(`${this.apiUrl}${query}`);
+  getRecords(financialYear = '', governmentLevel = '', estimateType = '') {
+    let params = new HttpParams();
+    if (financialYear) params = params.set('financialYear', financialYear);
+    if (governmentLevel) params = params.set('governmentLevel', governmentLevel);
+    if (estimateType) params = params.set('estimateType', estimateType);
+    return this.http.get<{ records: any[]; summary: Record<string, number> }>(this.apiUrl, { params });
   }
 }

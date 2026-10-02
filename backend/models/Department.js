@@ -13,6 +13,20 @@ const departmentSchema = new mongoose.Schema({
     unique: true,
     uppercase: true,
   },
+  governmentLevel: {
+    type: String,
+    enum: ['Union Ministry', 'Union Department', 'Maharashtra', 'Other'],
+    default: 'Other',
+  },
+  isOfficial: {
+    type: Boolean,
+    default: false,
+  },
+  sourceUrl: {
+    type: String,
+    default: '',
+    trim: true,
+  },
   description: {
     type: String,
     default: '',

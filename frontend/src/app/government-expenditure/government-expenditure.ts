@@ -10,10 +10,14 @@ import { GovernmentExpenditureService } from '../services/government-expenditure
   styleUrl: './government-expenditure.css'
 })
 export class GovernmentExpenditure implements OnInit {
-  yearOptions = ['All years', ...Array.from({ length: 50 }, (_, index) => String(2001 + index))];
+  yearOptions = ['All years'];
+  governmentLevels = ['All governments', 'Union Government', 'Maharashtra'];
+  estimateTypes = ['All types', 'Actual', 'Budget Estimate', 'Revised Estimate'];
   selectedYear = 'All years';
+  selectedGovernmentLevel = 'All governments';
+  selectedEstimateType = 'All types';
   records: any[] = [];
-  summary = { allocatedAmount: 0, actualAmount: 0, variance: 0 };
+  summary: Record<string, number> = { Actual: 0, 'Budget Estimate': 0, 'Revised Estimate': 0 };
   message = 'Loading expenditure records...';
 
   constructor(private expenditureService: GovernmentExpenditureService, private changeDetector: ChangeDetectorRef) {}
@@ -24,9 +28,15 @@ export class GovernmentExpenditure implements OnInit {
 
   loadRecords() {
     const year = this.selectedYear === 'All years' ? '' : this.selectedYear;
-    this.expenditureService.getRecords(year).subscribe({
+    const governmentLevel = this.selectedGovernmentLevel === 'All governments' ? '' : this.selectedGovernmentLevel;
+    const estimateType = this.selectedEstimateType === 'All types' ? '' : this.selectedEstimateType;
+    this.expenditureService.getRecords(year, governmentLevel, estimateType).subscribe({
       next: (response) => {
         this.records = response.records || [];
+        if (this.selectedYear === 'All years') {
+          this.yearOptions = ['All years', ...Array.from(new Set(this.records.map((record: any) => record.financialYear)))
+            .sort((first, second) => second.localeCompare(first))];
+        }
         this.summary = response.summary;
         this.message = this.records.length ? '' : 'No verified records have been imported for this filter.';
         this.changeDetector.detectChanges();
@@ -39,6 +49,6 @@ export class GovernmentExpenditure implements OnInit {
   }
 
   formatAmount(amount: number) {
-    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(amount || 0);
+    return new Intl.NumberFormat('en-IN', { maximumFractionDigits: 2 }).format(amount || 0);
   }
 }

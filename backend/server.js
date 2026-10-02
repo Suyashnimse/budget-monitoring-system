@@ -10,6 +10,7 @@ require("dotenv").config();
 const app = express();
 const budgetRoutes = require("./routes/budgetRoutes");
 const expenseRoutes = require("./routes/expenseRoutes");
+const governmentExpenditureRoutes = require("./routes/governmentExpenditureRoutes");
 const departmentRoutes = require("./routes/departmentRoutes");
 const uploadRoutes = require("./routes/uploadRoutes");
 const auditLogRoutes = require("./routes/auditLogRoutes");
@@ -19,6 +20,9 @@ const userRoutes = require("./routes/userRoutes");
 const User = require("./models/User");
 const ApprovalAuthority = require("./models/ApprovalAuthority");
 const Expense = require("./models/Expense");
+const Department = require("./models/Department");
+const GovernmentExpenditure = require("./models/GovernmentExpenditure");
+const governmentDepartments = require("./config/governmentDepartments");
 const JWT_SECRET = process.env.JWT_SECRET || "budget-monitoring-secret";
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/budget_monitoring";
 const PORT = Number(process.env.PORT) || 3000;
@@ -27,9 +31,11 @@ const otpChallenges = new Map();
 mongoose.connect(MONGO_URI)
   .then(() => {
     console.log("MongoDB Connected");
+    GovernmentExpenditure.syncIndexes().catch(error => console.log('Expenditure index sync error:', error.message));
     seedExpenses();
     seedAdminUser();
     seedMaharashtraAuthorities();
+    seedGovernmentDepartments();
   })
   .catch(err => console.log("MongoDB Error:", err));
 
@@ -67,7 +73,8 @@ async function seedAdminUser() {
       email: 'admin@test.com',
       password: 'admin123',
       role: 'Admin',
-      departmentId: ''
+      departmentId: '',
+      mobile: '0000000000'
     });
 
     await adminUser.save();
@@ -77,44 +84,74 @@ async function seedAdminUser() {
   }
 }
 
+async function seedGovernmentDepartments() {
+  try {
+    await Department.bulkWrite(governmentDepartments.map((department) => ({
+      updateOne: {
+        filter: { code: department.code },
+        update: { $setOnInsert: department },
+        upsert: true
+      }
+    })), { ordered: false });
+    console.log(`Seeded ${governmentDepartments.length} official government departments`);
+  } catch (error) {
+    console.log('Government department seeding error:', error.message);
+  }
+}
+
 async function seedMaharashtraAuthorities() {
   const authorities = [
-    ['Devendra Fadnavis', 'CM', 'Nagpur South-West', '175', 'Home, General Administration, Energy, Law & Judiciary, Water Resources'],
-    ['Eknath Shinde', 'DCM', 'Kopri-Pachpakhadi', '148', 'Urban Development, Transport'],
-    ['Sunetra Ajit Pawar', 'DCM', 'Baramati', '', 'Finance, Planning'],
-    ['Chandrasekhar Bawankule', 'Minister', 'Kamthi', '', 'Revenue'],
-    ['Chhagan Bhujbal', 'Minister', 'Yeola', '', 'Food & Civil Supplies'],
-    ['Radhakrishna Vikhe Patil', 'Minister', 'Shirdi', '', 'Revenue, Animal Husbandry & Dairy Development'],
-    ['Hasan Mushrif', 'Minister', 'Kagal', '', 'Medical Education'],
-    ['Chandrakant Dada Patil', 'Minister', 'Kothrud', '', 'Higher & Technical Education, Textiles'],
-    ['Girish Mahajan', 'Minister', 'Jamner', '', 'Rural Development, Panchayati Raj'],
-    ['Ganesh Naik', 'Minister', 'Airoli', '', 'Forest'],
-    ['Gulabrao Patil', 'Minister', 'Jalgaon Rural', '', 'Water Supply & Sanitation'],
-    ['Dadaji Bhuse', 'Minister', 'Malegaon Outer', '', 'School Education'],
-    ['Sanjay Rathod', 'Minister', 'Digras', '', 'Soil & Water Conservation'],
-    ['Mangal Prabhat Lodha', 'Minister', 'Malabar Hill', '', 'Skill Development, Tourism'],
-    ['Uday Samant', 'Minister', 'Ratnagiri', '', 'Industries'],
-    ['Jaykumar Rawal', 'Minister', 'Shahada', '', 'Marketing'],
-    ['Pankaja Munde', 'Minister', 'Parli', '', 'Environment, Animal Husbandry'],
-    ['Atul Save', 'Minister', 'Aurangabad East', '', 'Housing'],
-    ['Sanjay Savkare', 'Minister', 'Bhusawal', '', 'Textiles'],
-    ['Sanjay Shirsat', 'Minister', 'Aurangabad West', '', 'Social Justice'],
-    ['Pratap Sarnaik', 'Minister', 'Mira-Bhayandar', '', 'Transport'],
-    ['Bharat Gogawale', 'Minister', 'Mahad', '', 'Employment Guarantee Scheme, Horticulture'],
-    ['Makarand Jadhav Patil', 'Minister', 'Wai', '', 'Relief & Rehabilitation'],
-    ['Nitesh Rane', 'Minister', 'Kankavli', '', 'Fisheries'],
-    ['Akash Fundkar', 'Minister', 'Khamgaon', '', 'Labour'],
-    ['Ashish Jaiswal', 'Minister of State', 'Ramtek', '', 'Finance']
+    ['Devendra Fadnavis', 'CM', 'Nagpur South West', '52', 'BJP', 'Chief Minister; Home; Finance & Planning; General Administration; Law & Judiciary and other CM-held portfolios'],
+    ['Eknath Shinde', 'DCM', 'Kopri-Pachpakhadi', '147', 'Shiv Sena', 'Deputy Chief Minister; Urban Development'],
+    ['Sunetra Pawar', 'DCM', 'Baramati', '201', 'NCP', 'Deputy Chief Minister; Excise; Sports & Youth Welfare; Minority Development & Wakf', ['Sunetra Ajit Pawar']],
+    ['Chandrashekhar Bawankule', 'Minister', 'Kamthi', '58', 'BJP', 'Revenue', ['Chandrasekhar Bawankule']],
+    ['Chhagan Bhujbal', 'Minister', 'Yeola', '119', 'NCP', 'Food, Civil Supplies & Consumer Protection'],
+    ['Radhakrishna Vikhe Patil', 'Minister', 'Shirdi', '218', 'BJP', 'Water Resources'],
+    ['Hasan Mushrif', 'Minister', 'Kagal', '273', 'NCP', 'Medical Education'],
+    ['Chandrakant Patil', 'Minister', 'Kothrud', '210', 'BJP', 'Higher & Technical Education; Parliamentary Affairs', ['Chandrakant Dada Patil']],
+    ['Girish Mahajan', 'Minister', 'Jamner', '19', 'BJP', 'Water Resources; Disaster Management'],
+    ['Ganesh Naik', 'Minister', 'Airoli', '150', 'BJP', 'Forests'],
+    ['Gulabrao Patil', 'Minister', 'Jalgaon Rural', '14', 'Shiv Sena', 'Water Supply & Sanitation'],
+    ['Dada Bhuse', 'Minister', 'Malegaon Outer', '115', 'Shiv Sena', 'School Education', ['Dadaji Bhuse']],
+    ['Sanjay Rathod', 'Minister', 'Digras', '79', 'Shiv Sena', 'Soil & Water Conservation'],
+    ['Mangal Prabhat Lodha', 'Minister', 'Malabar Hill', '185', 'BJP', 'Skill Development, Employment, Entrepreneurship & Innovation'],
+    ['Uday Samant', 'Minister', 'Ratnagiri', '266', 'Shiv Sena', 'Industries; Marathi Language'],
+    ['Jaykumar Rawal', 'Minister', 'Sindkheda', '8', 'BJP', 'Marketing; Protocol'],
+    ['Pankaja Munde', 'Minister', 'Legislative Council', '', 'BJP', 'Environment & Climate Change; Animal Husbandry'],
+    ['Atul Save', 'Minister', 'Aurangabad East', '109', 'BJP', 'OBC Welfare; Dairy Development; Renewable Energy'],
+    ['Ashok Uike', 'Minister', 'Ralegaon', '77', 'BJP', 'Tribal Development'],
+    ['Shambhuraj Desai', 'Minister', 'Patan', '261', 'Shiv Sena', 'Tourism; Mining; Ex-Servicemen Welfare'],
+    ['Ashish Shelar', 'Minister', 'Vandre West', '177', 'BJP', 'Information Technology; Cultural Affairs'],
+    ['Dattatray Bharne', 'Minister', 'Indapur', '200', 'NCP', 'Agriculture'],
+    ['Aditi Tatkare', 'Minister', 'Shrivardhan', '193', 'NCP', 'Women & Child Development'],
+    ['Shivendrasinh Bhosale', 'Minister', 'Satara', '262', 'BJP', 'Public Works'],
+    ['Jaykumar Gore', 'Minister', 'Man', '258', 'BJP', 'Rural Development; Panchayati Raj'],
+    ['Narhari Zirwal', 'Minister', 'Dindori', '122', 'NCP', 'Food & Drug Administration; Special Assistance'],
+    ['Sanjay Savkare', 'Minister', 'Bhusawal', '12', 'BJP', 'Textiles'],
+    ['Sanjay Shirsat', 'Minister', 'Aurangabad West', '108', 'Shiv Sena', 'Social Justice'],
+    ['Pratap Sarnaik', 'Minister', 'Ovala-Majiwada', '146', 'Shiv Sena', 'Transport'],
+    ['Bharat Gogawale', 'Minister', 'Mahad', '194', 'Shiv Sena', 'Employment Guarantee; Horticulture; Salt Pan Land Development'],
+    ['Makarand Jadhav-Patil', 'Minister', 'Wai', '256', 'NCP', 'Relief & Rehabilitation', ['Makarand Jadhav Patil']],
+    ['Nitesh Rane', 'Minister', 'Kankavli', '268', 'BJP', 'Fisheries; Ports'],
+    ['Aakash Fundkar', 'Minister', 'Khamgaon', '26', 'BJP', 'Labour', ['Akash Fundkar']],
+    ['Babasaheb Patil', 'Minister', 'Ahmadpur', '236', 'NCP', 'Cooperation'],
+    ['Prakash Abitkar', 'Minister', 'Radhanagari', '272', 'Shiv Sena', 'Public Health & Family Welfare'],
+    ['Ashish Jaiswal', 'Minister of State', 'Ramtek', '59', 'Shiv Sena', 'Finance & Planning; Agriculture; Relief & Rehabilitation; Law & Judiciary; Labour'],
+    ['Madhuri Misal', 'Minister of State', 'Legislative Council', '', 'BJP', 'Urban Development; Transport; Social Justice; Medical Education; Minority Development'],
+    ['Pankaj Bhoyar', 'Minister of State', 'Wardha', '47', 'BJP', 'Home (Rural); Housing; School Education; Cooperation; Mining'],
+    ['Meghna Bordikar', 'Minister of State', 'Jintur', '95', 'BJP', 'Public Health; Water Supply; Energy; Women & Child Development; Public Works'],
+    ['Indranil Naik', 'Minister of State', 'Pusad', '81', 'NCP', 'Industries; Public Works; Higher & Technical Education; Tribal Development; Tourism; Soil & Water Conservation'],
+    ['Yogesh Kadam', 'Minister of State', 'Dapoli', '263', 'Shiv Sena', 'Home (Urban); Revenue; Rural Development; Food & Civil Supplies; Food & Drug Administration']
   ];
 
   try {
-    for (const [name, role, constituency, constituencyNumber, ministry] of authorities) {
+    for (const [name, role, constituency, constituencyNumber, party, ministry, aliases = []] of authorities) {
+      const authorityId = `${role.replace(/\s+/g, '-').toUpperCase()}-MH-${name.replace(/[^A-Z0-9]+/gi, '-').replace(/^-|-$/g, '').toUpperCase()}`;
       await ApprovalAuthority.updateOne(
-        { name, role, state: 'Maharashtra' },
-        { $setOnInsert: {
-          authorityId: `${role.replace(/\s+/g, '-').toUpperCase()}-MH-${name.replace(/[^A-Z]/gi, '').slice(0, 5).toUpperCase()}`,
-          name, role, constituency, constituencyNumber, state: 'Maharashtra', ministry,
-          source: 'User-provided list; verify against official records', sourceUrl: ''
+        { name: { $in: [name, ...aliases] }, state: 'Maharashtra' },
+        { $set: {
+          authorityId, name, role, constituency, constituencyNumber, state: 'Maharashtra', party, ministry,
+          source: 'User-provided list; not independently verified', sourceUrl: '', active: true
         } },
         { upsert: true }
       );
@@ -189,12 +226,12 @@ app.post("/register", async (req, res) => {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new User({ name, email, password, role, departmentId });
+    const user = new User({ name, email, password, role, departmentId, mobile });
     await user.save();
     otpChallenges.delete(otpChallengeId);
 
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
-    res.status(201).json({ message: "User registered successfully", token });
+    res.status(201).json({ message: "User registered successfully", token, user: { id: user._id, name: user.name, email: user.email, mobile: user.mobile, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: "Registration failed", error: error.message });
   }
@@ -269,6 +306,7 @@ console.log("Frontend dist path:", frontendDistPath || "not found", "exists:", f
 
 app.use("/api/budget", budgetRoutes);
 app.use("/api/expense", expenseRoutes);
+app.use("/api/government-expenditure", governmentExpenditureRoutes);
 app.use("/api/department", departmentRoutes);
 app.use("/api/alerts", alertRoutes);
 app.use("/api/approval-authorities", approvalAuthorityRoutes);

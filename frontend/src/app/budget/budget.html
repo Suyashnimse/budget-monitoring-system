@@ -1,11 +1,18 @@
 <div class="budget-page">
   <header class="budget-heading">
-    <div><p class="eyebrow">Allocation management</p><h2>Budget register</h2><p>Plan public allocations, record provenance, and route every submission for approval.</p></div>
-    <label class="state-filter">View state
-      <select [(ngModel)]="selectedState" name="selectedState" (change)="loadBudgets()">
-        <option *ngFor="let state of stateOptions" [value]="state">{{ state }}</option>
-      </select>
-    </label>
+    <div><p class="eyebrow">Allocation management</p><h2>Select Department</h2><p>Choose the department and manage its budget allocation and approval flow.</p></div>
+    <div class="state-filter">
+      <label>View state
+        <select [(ngModel)]="selectedState" name="selectedState" (change)="loadBudgets()">
+          <option *ngFor="let state of stateOptions" [value]="state">{{ state }}</option>
+        </select>
+      </label>
+      <label>Year
+        <select [(ngModel)]="selectedYear" name="selectedYear" (change)="loadBudgets()">
+          <option *ngFor="let year of yearOptions" [value]="year">{{ year === 'All years' ? 'All years' : 'FY ' + year }}</option>
+        </select>
+      </label>
+    </div>
   </header>
 
   <section class="summary-grid">
@@ -19,15 +26,23 @@
 
     <form (ngSubmit)="submitBudget()">
       <div class="form-grid">
+      <div class="form-group">
+        <label for="department">Department</label>
+        <select id="department" name="department" [(ngModel)]="budget.department" (change)="updateBudgetTitleFromDepartment()" required>
+          <option value="">Select a department</option>
+          <option *ngFor="let department of departmentOptions" [value]="department.name">{{ department.governmentLevel }} · {{ department.name }}</option>
+        </select>
+      </div>
+
       <div class="form-group wide-field">
         <label for="title">Budget Title</label>
-        <input id="title" name="title" [(ngModel)]="budget.title" placeholder="National health infrastructure allocation" required />
+        <input id="title" name="title" [(ngModel)]="budget.title" [value]="budget.department ? budget.department + ' Budget' : budget.title" placeholder="Department Budget" required />
       </div>
 
       <div class="form-group">
         <label for="financialYear">Financial Year</label>
         <select id="financialYear" name="financialYear" [(ngModel)]="budget.financialYear" required>
-          <option *ngFor="let year of yearOptions" [value]="year">FY {{ year }}-{{ year + 1 }}</option>
+          <option *ngFor="let year of yearOptions" [value]="year" [hidden]="year === 'All years'">FY {{ year }}-{{ +year + 1 }}</option>
         </select>
       </div>
 
@@ -35,14 +50,6 @@
         <label for="state">State / Union Territory</label>
         <select id="state" name="state" [(ngModel)]="budget.state" required>
           <option *ngFor="let state of stateOptions" [value]="state">{{ state }}</option>
-        </select>
-      </div>
-
-      <div class="form-group">
-        <label for="department">Department</label>
-        <select id="department" name="department" [(ngModel)]="budget.department" required>
-          <option value="">Select a department</option>
-          <option *ngFor="let department of departmentOptions" [value]="department">{{ department }}</option>
         </select>
       </div>
 
@@ -61,10 +68,6 @@
         <textarea id="description" name="description" rows="3" [(ngModel)]="budget.description" placeholder="Describe the purpose, expected outcome, and scope."></textarea>
       </div>
 
-      <div class="form-group">
-        <label for="source">Data source</label>
-        <input id="source" name="source" [(ngModel)]="budget.source" placeholder="Official ministry notification or department submission" />
-      </div>
       </div>
 
       <button class="submit-button" type="submit">Submit for approval</button>
@@ -79,7 +82,7 @@
       <div>
         <h4>{{ item.title || item.department + ' Budget' }}</h4>
         <p>{{ item.description || 'No details added yet.' }}</p>
-        <div class="record-meta"><span>{{ item.state || 'All India' }}</span><span>{{ item.department }}</span><span>FY {{ item.financialYear }}–{{ +item.financialYear + 1 }}</span><span>Source: {{ item.source || 'Department submission' }}</span></div>
+        <div class="record-meta"><span>{{ item.state || 'All India' }}</span><span>{{ item.department }}</span><span>FY {{ item.financialYear }}–{{ +item.financialYear + 1 }}</span></div>
       </div>
       <div class="budget-meta">
         <strong>₹{{ item.allocatedAmount | number }}</strong>

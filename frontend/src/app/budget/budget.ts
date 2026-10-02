@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { BudgetService } from '../services/budget';
+import { DepartmentService } from '../services/department.service';
 
 interface BudgetRecord {
   id?: string;
@@ -34,17 +35,9 @@ export class Budget implements OnInit {
     source: '',
     status: 'Pending Approval'
   };
-  departmentOptions = [
-    'Ministry of Finance',
-    'Ministry of Health and Family Welfare',
-    'Ministry of Education',
-    'Ministry of Rural Development',
-    'Ministry of Agriculture and Farmers Welfare',
-    'Ministry of Road Transport and Highways',
-    'Ministry of Women and Child Development',
-    'Ministry of Jal Shakti'
-  ];
-  yearOptions = Array.from({ length: 50 }, (_, index) => 2001 + index);
+  departmentOptions: any[] = [];
+  yearOptions = ['All years', ...Array.from({ length: 50 }, (_, index) => 2001 + index)];
+  selectedYear = 'All years';
   stateOptions = [
     'All India', 'Andhra Pradesh', 'Arunachal Pradesh', 'Assam', 'Bihar', 'Chhattisgarh',
     'Goa', 'Gujarat', 'Haryana', 'Himachal Pradesh', 'Jharkhand', 'Karnataka',
@@ -60,22 +53,47 @@ export class Budget implements OnInit {
   totalBudget = 0;
   pendingApprovals = 0;
 
-  constructor(private budgetService: BudgetService) {}
+  constructor(private budgetService: BudgetService, private departmentService: DepartmentService) {}
 
   ngOnInit() {
     this.loadBudgets();
-    this.budget.department = 'Finance';
+    this.loadDepartments();
     this.budget.financialYear = '2026';
     this.budget.allocationDate = '2026-07-01';
   }
 
+  updateBudgetTitleFromDepartment() {
+    const departmentName = (this.budget.department || '').trim();
+    if (!departmentName) {
+      this.budget.title = '';
+      return;
+    }
+    const currentTitle = (this.budget.title || '').trim();
+    if (!currentTitle || currentTitle === 'Budget') {
+      this.budget.title = `${departmentName} Budget`;
+    }
+  }
+
+  loadDepartments() {
+    this.departmentService.getDepartments().subscribe((data: any) => {
+      this.departmentOptions = (data || [])
+        .filter((department: any) => department.isOfficial || ['Union Ministry', 'Union Department', 'Maharashtra'].includes(department.governmentLevel))
+        .sort((first: any, second: any) => first.governmentLevel.localeCompare(second.governmentLevel) || first.name.localeCompare(second.name));
+    });
+  }
+
   loadBudgets() {
     this.budgetService.getBudgets(this.selectedState === 'All India' ? '' : this.selectedState).subscribe((data: any) => {
-      this.budgets = (data || []).map((item: any) => ({
+      const allBudgets = (data || []).map((item: any) => ({
         ...item,
         title: item.title || `${item.department || 'Budget'} Budget`,
         status: item.status || 'Pending Approval'
       }));
+
+      this.budgets = this.selectedYear === 'All years'
+        ? allBudgets
+        : allBudgets.filter((item: any) => String(item.financialYear) === String(this.selectedYear));
+
       this.totalBudget = this.budgets.reduce((sum: number, item: any) => sum + (item.allocatedAmount || 0), 0);
       this.pendingApprovals = this.budgets.filter((item: any) => item.status === 'Pending Approval').length;
     });

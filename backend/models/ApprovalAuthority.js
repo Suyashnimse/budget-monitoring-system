@@ -7,6 +7,7 @@ const approvalAuthoritySchema = new mongoose.Schema({
   constituency: { type: String, required: true, trim: true },
   constituencyNumber: { type: String, default: '', trim: true },
   state: { type: String, required: true, trim: true },
+  party: { type: String, default: '', trim: true },
   ministry: { type: String, default: '', trim: true },
   contact: { type: String, default: '', trim: true },
   source: { type: String, required: true, trim: true },

@@ -15,14 +15,14 @@ router.get('/', async (req, res) => {
 
 router.post('/', async (req, res) => {
   try {
-    const { name, role, constituency, constituencyNumber, state, ministry, contact, source, sourceUrl } = req.body;
+    const { name, role, constituency, constituencyNumber, state, party, ministry, contact, source, sourceUrl } = req.body;
     if (!name || !allowedRoles.includes(role) || !constituency || !state || !source) {
       return res.status(400).json({ message: 'Name, allowed role, constituency, state, and source are required' });
     }
 
     const authority = await ApprovalAuthority.create({
       authorityId: `${role}-${crypto.randomBytes(4).toString('hex').toUpperCase()}`,
-      name, role, constituency, constituencyNumber, state, ministry, contact, source, sourceUrl
+      name, role, constituency, constituencyNumber, state, party, ministry, contact, source, sourceUrl
     });
     res.status(201).json(authority);
   } catch (error) {
@@ -42,6 +42,7 @@ router.post('/import', async (req, res) => {
       constituency: String(member.constituency || '').trim(),
       constituencyNumber: String(member.constituencyNumber || '').trim(),
       state: String(member.state || 'Maharashtra').trim(),
+      party: String(member.party || '').trim(),
       ministry: String(member.ministry || '').trim(),
       contact: String(member.contact || '').trim(),
       source: String(member.source || '').trim(),

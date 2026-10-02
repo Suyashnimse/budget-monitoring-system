@@ -209,6 +209,11 @@
   object-fit: contain;
 }
 
+.emblem-card img.india-emblem {
+  width: 48px;
+  height: 38px;
+}
+
 .header-nav {
   display: flex;
   align-items: center;

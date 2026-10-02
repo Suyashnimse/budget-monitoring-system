@@ -5,7 +5,7 @@
         <div class="header-identity">
           <div class="header-brand-mark">JD</div>
           <div>
-            <p class="eyebrow">Public finance workspace</p>
+            <p class="eyebrow">Government Finance Transparency Platform</p>
             <h2 class="site-title">Jan Dhan Budget Monitoring System</h2>
             <p class="header-subtitle">Track allocations, spending, and accountability in one place.</p>
           </div>
@@ -14,13 +14,13 @@
           <span class="user-avatar">{{ (loggedInUser.name || loggedInUser.email).charAt(0).toUpperCase() }}</span>
           <span class="user-name">{{ loggedInUser.name || loggedInUser.email }}</span>
         </div>
-        <div class="official-emblems" aria-label="Government reference emblems">
+        <div class="official-emblems" aria-label="Official Government of India and Maharashtra logos">
           <div class="emblem-card">
-            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_India.svg" alt="Government of India emblem" />
+            <img class="india-emblem" src="https://www.india.gov.in/image/npi_logo.svg" alt="Official Government of India portal logo" loading="eager" />
             <span>Government of India</span>
           </div>
           <div class="emblem-card">
-            <img src="https://commons.wikimedia.org/wiki/Special:FilePath/Emblem_of_Maharashtra.svg" alt="Government of Maharashtra emblem" />
+            <img src="https://maharashtra.gov.in/images/logo_MH.png" alt="Official Government of Maharashtra logo" />
             <span>Government of Maharashtra</span>
           </div>
         </div>
@@ -46,7 +46,6 @@
         <a routerLink="/budget" (click)="closeMenus()">Create Budget</a>
         <a routerLink="/expense" (click)="closeMenus()">Add Expense</a>
         <a routerLink="/users" (click)="closeMenus()">Create User</a>
-        <a routerLink="/departments" (click)="closeMenus()">Create Department</a>
       </div>
 
       <div class="page-overlay menu-overlay" *ngIf="dropdownOpen">
