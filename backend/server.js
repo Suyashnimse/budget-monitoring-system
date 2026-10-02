@@ -166,6 +166,8 @@ const configuredOrigins = (process.env.FRONTEND_URLS || process.env.FRONTEND_URL
 const allowedOrigins = [
   'https://budget-monitoring-system.vercel.app',
   'https://budget-monitoring-system-budget-monitoring-system.vercel.app',
+  'https://localhost',
+  'capacitor://localhost',
   'http://localhost:4200',
   'http://localhost:3000',
   ...configuredOrigins
