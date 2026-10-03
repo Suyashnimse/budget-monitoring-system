@@ -37,7 +37,15 @@ export class UserService {
   }
 
   requestRegistrationOtp(email: string, mobile: string) {
-    return this.http.post(`${this.apiUrl}/api/otp/request`, { email, mobile });
+    return this.http.post(`${this.apiUrl}/api/otp/request`, { email, mobile, purpose: 'registration' });
+  }
+
+  requestLoginOtp(email: string, mobile: string) {
+    return this.http.post(`${this.apiUrl}/api/otp/request`, { email, mobile, purpose: 'login' });
+  }
+
+  loginWithOtp(challengeId: string) {
+    return this.http.post(`${this.apiUrl}/api/otp/login`, { challengeId });
   }
 
   verifyRegistrationOtp(challengeId: string, channel: 'email' | 'mobile', code: string) {

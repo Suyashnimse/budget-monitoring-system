@@ -1,88 +1,448 @@
+```html
 <div class="login-shell">
   <div class="login-panel">
+
+    <!-- Left side -->
     <div class="login-hero">
       <div class="brand-mark">BC</div>
+
       <h1>Jan Dhan Budget Monitoring System</h1>
-      <p>Secure access for finance teams, department leads, and operations admins.</p>
-      <ul>
-        <li>Real-time budget visibility</li>
-        <li>Protected financial approvals</li>
-        <li>Clear team accountability</li>
-      </ul>
+
+      <p>
+        Secure access for finance teams, department leads,
+        and operations admins.
+      </p>
+
+      <p>
+        <strong>
+          Every Rupee Tracked. Every Decision Accounted.
+        </strong>
+      </p>
     </div>
 
+    <!-- Right side -->
     <div class="login-card">
+
       <div class="brand-block">
         <div class="mini-brand">
+
           <div class="brand-mark">BC</div>
+
           <div>
             <h2>Welcome back</h2>
             <p>Access your business planning workspace.</p>
           </div>
+
         </div>
       </div>
 
+      <!-- Login / Register -->
       <div class="toggle-row">
-        <button type="button" [class.active]="!isRegistering" (click)="showLogin()">Login</button>
-        <button type="button" [class.active]="isRegistering" (click)="showRegister()">Create Account</button>
+
+        <button
+          type="button"
+          [class.active]="!isRegistering && !isOtpLogin"
+          (click)="showLogin()">
+          Login
+        </button>
+
+        <button
+          type="button"
+          [class.active]="isOtpLogin"
+          (click)="showOtpLogin()">
+          OTP Login
+        </button>
+
+        <button
+          type="button"
+          [class.active]="isRegistering"
+          (click)="showRegister()">
+          Create Account
+        </button>
+
       </div>
 
-      <div class="social-row">
-        <div #googleButton class="google-button" aria-label="Continue with Google"></div>
-      </div>
+      <!-- Google -->
+      <div
+        class="social-row"
+        *ngIf="isGoogleLoginAvailable">
 
-      <div class="divider"><span>or use your email</span></div>
-
-      <form *ngIf="!isRegistering" (ngSubmit)="login()">
-        <label for="email">Email</label>
-        <input id="email" type="email" placeholder="Enter your email" [(ngModel)]="email" name="email" />
-
-        <label for="password">Password</label>
-        <div class="password-field">
-          <input id="password" [type]="showPassword ? 'text' : 'password'" placeholder="Enter your password" [(ngModel)]="password" name="password" />
-          <button type="button" class="ghost-btn" (click)="showPassword = !showPassword">
-            {{ showPassword ? 'Hide' : 'Show' }}
-          </button>
+        <div
+          #googleButton
+          class="google-button"
+          aria-label="Continue with Google">
         </div>
 
-        <button type="submit">Sign In</button>
+      </div>
+
+      <div class="divider">
+        <span>or use your email</span>
+      </div>
+
+      <!-- ========================= -->
+      <!-- LOGIN FORM -->
+      <!-- ========================= -->
+
+      <form
+        *ngIf="!isRegistering && !isOtpLogin"
+        (ngSubmit)="login()">
+
+        <label for="email">
+          Email
+        </label>
+
+        <input
+          id="email"
+          type="email"
+          placeholder="Enter your email"
+          [(ngModel)]="email"
+          name="email"
+          required
+        />
+
+        <label for="password">
+          Password
+        </label>
+
+        <div class="password-field">
+
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            placeholder="Enter your password"
+            [(ngModel)]="password"
+            name="password"
+            required
+          />
+
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="showPassword = !showPassword">
+
+            {{ showPassword ? 'Hide' : 'Show' }}
+
+          </button>
+
+        </div>
+
+        <button type="submit">
+          Sign In
+        </button>
+
       </form>
 
-      <form *ngIf="isRegistering" (ngSubmit)="register()">
-        <label for="name">Full Name</label>
-        <input id="name" name="name" [(ngModel)]="name" placeholder="Enter your name" required />
+      <!-- OTP sign-in -->
+      <form
+        *ngIf="isOtpLogin"
+        (ngSubmit)="loginWithOtp()">
 
-        <label for="emailReg">Email</label>
-        <input id="emailReg" name="emailReg" type="email" [(ngModel)]="email" placeholder="you@example.com" required />
+        <p class="otp-intro">Sign in using codes sent to the email and mobile number registered to your account.</p>
 
-        <label for="mobile">Mobile Number</label>
-        <input id="mobile" name="mobile" [(ngModel)]="mobile" placeholder="Enter mobile number" required />
+        <label for="otpLoginEmail">Account email</label>
+        <input
+          id="otpLoginEmail"
+          name="otpLoginEmail"
+          type="email"
+          [(ngModel)]="email"
+          (ngModelChange)="onOtpContactChanged()"
+          placeholder="Enter your account email"
+          required
+        />
+
+        <label for="otpLoginMobile">Registered mobile number</label>
+        <input
+          id="otpLoginMobile"
+          name="otpLoginMobile"
+          type="tel"
+          [(ngModel)]="mobile"
+          (ngModelChange)="onOtpContactChanged()"
+          placeholder="+919876543210"
+          required
+        />
+
+        <button type="button" class="otp-btn" (click)="sendOtp()" [disabled]="isSendingOtp">
+          {{ isSendingOtp ? 'Sending codes...' : 'Send sign-in codes' }}
+        </button>
+
+        <div class="otp-code-group" *ngIf="otpChallengeId">
+          <label for="otpLoginEmailCode">Email code</label>
+          <div class="otp-code-row">
+            <input id="otpLoginEmailCode" name="otpLoginEmailCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [(ngModel)]="emailOtp" placeholder="6-digit email code" />
+            <button type="button" class="otp-btn" (click)="verifyEmailOtp()" [disabled]="isVerifyingEmailOtp || emailOtpVerified">
+              {{ emailOtpVerified ? 'Verified' : isVerifyingEmailOtp ? 'Checking...' : 'Verify' }}
+            </button>
+          </div>
+
+          <label for="otpLoginMobileCode">SMS code</label>
+          <div class="otp-code-row">
+            <input id="otpLoginMobileCode" name="otpLoginMobileCode" type="text" inputmode="numeric" autocomplete="one-time-code" maxlength="6" [(ngModel)]="mobileOtp" placeholder="6-digit SMS code" />
+            <button type="button" class="otp-btn" (click)="verifyMobileOtp()" [disabled]="isVerifyingMobileOtp || mobileOtpVerified">
+              {{ mobileOtpVerified ? 'Verified' : isVerifyingMobileOtp ? 'Checking...' : 'Verify' }}
+            </button>
+          </div>
+        </div>
+
+        <p class="otp-message" *ngIf="otpMessage" role="status" aria-live="polite">{{ otpMessage }}</p>
+
+        <button type="submit" [disabled]="isLoggingInWithOtp || !otpChallengeId || !emailOtpVerified || !mobileOtpVerified">
+          {{ isLoggingInWithOtp ? 'Signing in...' : 'Verify and Sign In' }}
+        </button>
+      </form>
+
+      <!-- ========================= -->
+      <!-- REGISTRATION FORM -->
+      <!-- ========================= -->
+
+      <form
+        *ngIf="isRegistering"
+        (ngSubmit)="register()">
+
+        <!-- Name -->
+        <label for="name">
+          Full Name
+        </label>
+
+        <input
+          id="name"
+          name="name"
+          [(ngModel)]="name"
+          placeholder="Enter your name"
+          required
+        />
+
+        <!-- Email -->
+        <label for="emailReg">
+          Email
+        </label>
+
+        <input
+          id="emailReg"
+          name="emailReg"
+          type="email"
+          [(ngModel)]="email"
+          (ngModelChange)="onOtpContactChanged()"
+          placeholder="you@example.com"
+          required
+        />
+
+        <!-- Mobile -->
+        <label for="mobile">
+          Mobile Number
+        </label>
+
+        <input
+          id="mobile"
+          name="mobile"
+          type="tel"
+          [(ngModel)]="mobile"
+          (ngModelChange)="onOtpContactChanged()"
+          placeholder="+919876543210"
+          required
+        />
+
+        <small>
+          Enter your mobile number with country code.
+          Example: +919876543210
+        </small>
+
+        <!-- ========================= -->
+        <!-- OTP SECTION -->
+        <!-- ========================= -->
 
         <div class="otp-box">
-          <label for="otp">OTP Verification</label>
-          <input id="otp" name="otp" [(ngModel)]="otp" placeholder="Enter OTP" />
-          <button type="button" class="otp-btn" (click)="sendOtp()">Send OTP</button>
-          <p class="otp-message" *ngIf="otpMessage">{{ otpMessage }}</p>
+
+          <h3>OTP Verification</h3>
+
+          <p>
+            We will send separate verification codes
+            to your email and mobile number.
+          </p>
+
+          <!-- Send OTP -->
+          <button
+            type="button"
+            class="otp-btn"
+            (click)="sendOtp()"
+            [disabled]="isSendingOtp">
+
+            {{ isSendingOtp ? 'Sending...' : 'Send OTP' }}
+
+          </button>
+
+          <!-- Status message -->
+          <p
+            class="otp-message"
+            *ngIf="otpMessage"
+            role="status"
+            aria-live="polite">
+
+            {{ otpMessage }}
+
+          </p>
+
+          <!-- ========================= -->
+          <!-- EMAIL OTP -->
+          <!-- ========================= -->
+
+          <div *ngIf="otpChallengeId">
+
+            <label for="emailOtp">
+              Email OTP
+            </label>
+
+            <input
+              id="emailOtp"
+              name="emailOtp"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="Enter email OTP"
+              [(ngModel)]="emailOtp"
+            />
+
+            <button
+              type="button"
+              class="otp-btn"
+              (click)="verifyEmailOtp()"
+              [disabled]="isVerifyingEmailOtp || emailOtpVerified">
+
+              {{
+                emailOtpVerified
+                  ? 'Email Verified ✓'
+                  : isVerifyingEmailOtp
+                    ? 'Verifying...'
+                    : 'Verify Email OTP'
+              }}
+
+            </button>
+
+          </div>
+
+          <!-- ========================= -->
+          <!-- MOBILE OTP -->
+          <!-- ========================= -->
+
+          <div *ngIf="otpChallengeId">
+
+            <label for="mobileOtp">
+              Mobile OTP
+            </label>
+
+            <input
+              id="mobileOtp"
+              name="mobileOtp"
+              type="text"
+              inputmode="numeric"
+              maxlength="6"
+              placeholder="Enter mobile OTP"
+              [(ngModel)]="mobileOtp"
+            />
+
+            <button
+              type="button"
+              class="otp-btn"
+              (click)="verifyMobileOtp()"
+              [disabled]="isVerifyingMobileOtp || mobileOtpVerified">
+
+              {{
+                mobileOtpVerified
+                  ? 'Mobile Verified ✓'
+                  : isVerifyingMobileOtp
+                    ? 'Verifying...'
+                    : 'Verify Mobile OTP'
+              }}
+
+            </button>
+
+          </div>
+
         </div>
 
-        <label for="passwordReg">Password</label>
+        <!-- Password -->
+        <label for="passwordReg">
+          Password
+        </label>
+
         <div class="password-field">
-          <input id="passwordReg" name="passwordReg" [type]="showPassword ? 'text' : 'password'" [(ngModel)]="password" placeholder="Choose a password" required />
-          <button type="button" class="ghost-btn" (click)="showPassword = !showPassword">
+
+          <input
+            id="passwordReg"
+            name="passwordReg"
+            [type]="showPassword ? 'text' : 'password'"
+            [(ngModel)]="password"
+            placeholder="Choose a password"
+            required
+          />
+
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="showPassword = !showPassword">
+
             {{ showPassword ? 'Hide' : 'Show' }}
+
           </button>
+
         </div>
 
-        <label for="confirmPassword">Confirm Password</label>
+        <!-- Confirm Password -->
+        <label for="confirmPassword">
+          Confirm Password
+        </label>
+
         <div class="password-field">
-          <input id="confirmPassword" name="confirmPassword" [type]="showConfirmPassword ? 'text' : 'password'" [(ngModel)]="confirmPassword" placeholder="Re-enter password" required />
-          <button type="button" class="ghost-btn" (click)="showConfirmPassword = !showConfirmPassword">
+
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            [(ngModel)]="confirmPassword"
+            placeholder="Re-enter password"
+            required
+          />
+
+          <button
+            type="button"
+            class="ghost-btn"
+            (click)="showConfirmPassword = !showConfirmPassword">
+
             {{ showConfirmPassword ? 'Hide' : 'Show' }}
+
           </button>
+
         </div>
 
-        <button type="submit">Create Account</button>
+        <!-- Create Account -->
+        <button
+          type="submit"
+          [disabled]="isRegisteringUser || !otpChallengeId || !emailOtpVerified || !mobileOtpVerified">
+
+          {{
+            isRegisteringUser
+              ? 'Creating Account...'
+              : 'Create Account'
+          }}
+
+        </button>
+
       </form>
+
     </div>
   </div>
+
+  <!-- Footer -->
+  <footer class="login-legal-links">
+
+    <a href="/privacy-policy.html">
+      Privacy policy
+    </a>
+
+    <a href="/account-deletion.html">
+      Account deletion
+    </a>
+
+  </footer>
+
 </div>
+```

@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background: linear-gradient(135deg, #f8fafc 0%, #e0f2fe 100%);
+  background: transparent;
 }
 
 .login-panel {
@@ -18,7 +18,10 @@
 }
 
 .login-hero {
-  background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+  position: relative;
+  overflow: hidden;
+  min-height: 420px;
+  background: linear-gradient(155deg, rgba(9, 36, 29, 0.28), rgba(6, 25, 22, 0.76)), url('/images/farmer-sunset.webp') center 58% / cover;
   color: white;
   padding: 2.4rem;
   display: flex;
@@ -101,12 +104,14 @@
 
 .toggle-row button {
   flex: 1;
+  min-width: 0;
   padding: 0.7rem;
   border: 1px solid #cbd5e1;
   border-radius: 10px;
   background: #f8fafc;
   color: #334155;
   cursor: pointer;
+  font-size: 0.84rem;
 }
 
 .toggle-row button.active {
@@ -274,6 +279,39 @@ button:hover {
   gap: 0.5rem;
 }
 
+.otp-intro {
+  margin: 0;
+  color: #536779;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.otp-code-group {
+  display: grid;
+  gap: 0.55rem;
+  margin-top: 0.35rem;
+}
+
+.otp-code-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.otp-code-row .otp-btn {
+  margin: 0;
+  min-height: 44px;
+}
+
+.otp-message {
+  margin: 0;
+  color: #365d4b;
+  font-size: 0.85rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .otp-btn {
   width: fit-content;
   padding: 0.6rem 0.8rem;
@@ -284,4 +322,17 @@ button:hover {
   .login-panel {
     grid-template-columns: 1fr;
   }
+
+  .login-hero {
+    min-height: 380px;
+  }
+}
+
+@media (max-width: 420px) {
+  .login-shell { padding: 1rem; }
+  .login-card { padding: 1.35rem; }
+  .toggle-row { gap: 0.35rem; }
+  .toggle-row button { padding: 0.65rem 0.35rem; font-size: 0.78rem; }
+  .otp-code-row { grid-template-columns: minmax(0, 1fr); }
+  .otp-code-row .otp-btn { width: 100%; }
 }

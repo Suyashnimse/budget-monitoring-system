@@ -17,7 +17,9 @@ const auditLogRoutes = require("./routes/auditLogRoutes");
 const alertRoutes = require("./routes/alertRoutes");
 const approvalAuthorityRoutes = require("./routes/approvalAuthorityRoutes");
 const userRoutes = require("./routes/userRoutes");
+const otpRoutes = require("./routes/otpRoutes");
 const User = require("./models/User");
+const OtpChallenge = require("./models/OtpChallenge");
 const ApprovalAuthority = require("./models/ApprovalAuthority");
 const Expense = require("./models/Expense");
 const Department = require("./models/Department");
@@ -26,7 +28,6 @@ const governmentDepartments = require("./config/governmentDepartments");
 const JWT_SECRET = process.env.JWT_SECRET || "budget-monitoring-secret";
 const MONGO_URI = process.env.MONGO_URI || "mongodb://127.0.0.1:27017/budget_monitoring";
 const PORT = Number(process.env.PORT) || 3000;
-const otpChallenges = new Map();
 
 mongoose.connect(MONGO_URI)
   .then(() => {
@@ -211,70 +212,44 @@ app.get("/health", (req, res) => {
 app.post("/register", async (req, res) => {
   try {
     const { name, email, password, role, departmentId, mobile, otpChallengeId } = req.body;
+    const normalizedEmail = String(email || '').trim().toLowerCase();
+    const normalizedMobile = String(mobile || '').replace(/[\s()-]/g, '');
 
-    if (!name || !email || !mobile || !password) {
+    if (!name || !normalizedEmail || !normalizedMobile || !password) {
       return res.status(400).json({ message: "Name, email, mobile, and password are required" });
     }
 
-    if (otpChallengeId) {
-      const challenge = otpChallenges.get(otpChallengeId);
-      if (!challenge || !challenge.emailVerified || !challenge.mobileVerified || challenge.email !== email || challenge.mobile !== mobile) {
-        return res.status(400).json({ message: "Verify your email and mobile number before registering" });
-      }
+    if (!mongoose.Types.ObjectId.isValid(otpChallengeId)) {
+      return res.status(400).json({ message: "Verify your email and mobile number before registering" });
     }
 
-    const existingUser = await User.findOne({ email });
+    const challenge = await OtpChallenge.findOne({
+      _id: otpChallengeId,
+      purpose: 'registration',
+      email: normalizedEmail,
+      mobile: normalizedMobile,
+      emailVerified: true,
+      mobileVerified: true,
+      expiresAt: { $gt: new Date() }
+    });
+    if (!challenge) {
+      return res.status(400).json({ message: "Verify your email and mobile number before registering" });
+    }
+
+    const existingUser = await User.findOne({ email: normalizedEmail });
     if (existingUser) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    const user = new User({ name, email, password, role, departmentId, mobile });
+    const user = new User({ name, email: normalizedEmail, password, role, departmentId, mobile: normalizedMobile });
     await user.save();
-    otpChallenges.delete(otpChallengeId);
+    await OtpChallenge.deleteOne({ _id: challenge._id });
 
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
     res.status(201).json({ message: "User registered successfully", token, user: { id: user._id, name: user.name, email: user.email, mobile: user.mobile, role: user.role } });
   } catch (error) {
     res.status(500).json({ message: "Registration failed", error: error.message });
   }
-});
-
-app.post("/api/otp/request", (req, res) => {
-  const { email, mobile } = req.body;
-  if (!email || !mobile) {
-    return res.status(400).json({ message: "Email and mobile number are required" });
-  }
-
-  const challengeId = `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
-  otpChallenges.set(challengeId, {
-    email,
-    mobile,
-    emailCode: "123456",
-    mobileCode: "654321",
-    emailVerified: false,
-    mobileVerified: false,
-    expiresAt: Date.now() + 10 * 60 * 1000
-  });
-
-  res.json({
-    challengeId,
-    message: "Verification codes generated. Email: 123456, Mobile: 654321"
-  });
-});
-
-app.post("/api/otp/verify", (req, res) => {
-  const { challengeId, channel, code } = req.body;
-  const challenge = otpChallenges.get(challengeId);
-  if (!challenge || challenge.expiresAt < Date.now()) {
-    return res.status(400).json({ message: "Verification request expired. Send new codes." });
-  }
-
-  if (!['email', 'mobile'].includes(channel) || challenge[`${channel}Code`] !== code) {
-    return res.status(400).json({ message: "Incorrect verification code" });
-  }
-
-  challenge[`${channel}Verified`] = true;
-  res.json({ emailVerified: challenge.emailVerified, mobileVerified: challenge.mobileVerified });
 });
 
 app.post("/login", async (req, res) => {
@@ -314,6 +289,7 @@ app.use("/api/alerts", alertRoutes);
 app.use("/api/approval-authorities", approvalAuthorityRoutes);
 app.use("/api/auditlogs", auditLogRoutes);
 app.use("/api/users", userRoutes);
+app.use("/api/otp", otpRoutes);
 app.use("/api", uploadRoutes);
 
 if (frontendDistExists) {
@@ -339,3 +315,4 @@ app.get("*", (req, res, next) => {
 app.listen(PORT, () => {
   console.log("Server Running on Port", PORT);
 });
+
