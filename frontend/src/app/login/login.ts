@@ -369,7 +369,7 @@ export class Login implements AfterViewInit {
 
             localStorage.setItem(
               'loggedInUser',
-              JSON.stringify({
+              JSON.stringify(response.user || {
                 name: this.email,
                 email: this.email
               })

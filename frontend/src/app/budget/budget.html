@@ -28,52 +28,54 @@
       <div class="form-grid">
       <div class="form-group">
         <label for="department">Department</label>
-        <select id="department" name="department" [(ngModel)]="budget.department" (change)="updateBudgetTitleFromDepartment()" required>
-          <option value="">Select a department</option>
+        <select id="department" name="department" [(ngModel)]="budget.department" (ngModelChange)="updateBudgetTitleFromDepartment()" required [disabled]="isLoadingDepartments || isSubmitting">
+          <option value="">{{ isLoadingDepartments ? 'Loading departments...' : 'Select a department' }}</option>
           <option *ngFor="let department of departmentOptions" [value]="department.name">{{ department.governmentLevel }} · {{ department.name }}</option>
         </select>
       </div>
 
       <div class="form-group wide-field">
         <label for="title">Budget Title</label>
-        <input id="title" name="title" [(ngModel)]="budget.title" [value]="budget.department ? budget.department + ' Budget' : budget.title" placeholder="Department Budget" required />
+        <input id="title" name="title" [(ngModel)]="budget.title" placeholder="Department Budget" required [disabled]="isSubmitting" />
       </div>
 
       <div class="form-group">
         <label for="financialYear">Financial Year</label>
-        <select id="financialYear" name="financialYear" [(ngModel)]="budget.financialYear" required>
+        <select id="financialYear" name="financialYear" [(ngModel)]="budget.financialYear" required [disabled]="isSubmitting">
           <option *ngFor="let year of yearOptions" [value]="year" [hidden]="year === 'All years'">FY {{ year }}-{{ +year + 1 }}</option>
         </select>
       </div>
 
       <div class="form-group">
         <label for="state">State / Union Territory</label>
-        <select id="state" name="state" [(ngModel)]="budget.state" required>
+        <select id="state" name="state" [(ngModel)]="budget.state" required [disabled]="isSubmitting">
           <option *ngFor="let state of stateOptions" [value]="state">{{ state }}</option>
         </select>
       </div>
 
       <div class="form-group">
         <label for="allocatedAmount">Allocated Amount</label>
-        <input id="allocatedAmount" name="allocatedAmount" type="number" [(ngModel)]="budget.allocatedAmount" required />
+        <input id="allocatedAmount" name="allocatedAmount" type="number" min="0.01" step="0.01" [(ngModel)]="budget.allocatedAmount" required [disabled]="isSubmitting" />
       </div>
 
       <div class="form-group">
         <label for="allocationDate">Allocation date</label>
-        <input id="allocationDate" name="allocationDate" type="date" [(ngModel)]="budget.allocationDate" required />
+        <input id="allocationDate" name="allocationDate" type="date" [(ngModel)]="budget.allocationDate" required [disabled]="isSubmitting" />
       </div>
 
       <div class="form-group wide-field">
         <label for="description">Budget Details</label>
-        <textarea id="description" name="description" rows="3" [(ngModel)]="budget.description" placeholder="Describe the purpose, expected outcome, and scope."></textarea>
+        <textarea id="description" name="description" rows="3" [(ngModel)]="budget.description" placeholder="Describe the purpose, expected outcome, and scope." [disabled]="isSubmitting"></textarea>
       </div>
 
       </div>
 
-      <button class="submit-button" type="submit">Submit for approval</button>
+      <button class="submit-button" type="submit" [disabled]="isSubmitting || isLoadingDepartments || !departmentOptions.length">
+        {{ isSubmitting ? 'Submitting...' : 'Submit for approval' }}
+      </button>
     </form>
 
-    <p class="message" *ngIf="message">{{ message }}</p>
+    <p class="message" *ngIf="message" role="status" aria-live="polite">{{ message }}</p>
   </section>
 
   <section class="card list-card">

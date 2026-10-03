@@ -10,6 +10,7 @@ const BudgetSchema = new mongoose.Schema({
   description: { type: String, trim: true, default: '' },
   status: { type: String, enum: ['Pending Approval', 'Approved', 'Rejected'], default: 'Pending Approval' },
   source: { type: String, trim: true, default: 'Department submission' },
+  assignedAuthorityIds: { type: [String], default: [] },
   approval: {
     authorityId: { type: String, default: '' },
     authorityName: { type: String, default: '' },

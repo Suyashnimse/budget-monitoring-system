@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
+import { ActivatedRoute } from '@angular/router';
 import { BudgetService } from '../services/budget';
 import { environment } from '../../environments/environment';
 
@@ -14,9 +15,20 @@ import { environment } from '../../environments/environment';
 export class Approvals implements OnInit {
   approvals: any[] = [];
   authorities: any[] = [];
+  selectedAuthorityByBudget: Record<string, string> = {};
   selectedAuthorityId = '';
-  authorityLookup = '';
-  authority = { name: '', role: '', constituency: '', constituencyNumber: '', state: 'Maharashtra', party: '', ministry: '', contact: '', source: 'User-provided manual registration', sourceUrl: '' };
+  authority = {
+    name: '',
+    role: '',
+    constituency: '',
+    constituencyNumber: '',
+    state: 'Maharashtra',
+    party: '',
+    ministry: '',
+    contact: '',
+    source: 'User-provided manual registration',
+    sourceUrl: ''
+  };
   roles = ['CM', 'DCM', 'MLA', 'PM', 'MP', 'Minister', 'Minister of State'];
   selectedStatus = 'All';
   authoritySearch = '';
@@ -27,13 +39,26 @@ export class Approvals implements OnInit {
   ministerDepartmentSearch = '';
   message = '';
   currentUser: any = null;
+  highlightedBudgetId = '';
 
-  constructor(private budgetService: BudgetService, private http: HttpClient, private changeDetector: ChangeDetectorRef) {}
+  constructor(
+    private budgetService: BudgetService,
+    private http: HttpClient,
+    private changeDetector: ChangeDetectorRef,
+    private route: ActivatedRoute
+  ) {}
 
   ngOnInit() {
     const savedUser = localStorage.getItem('loggedInUser');
     this.currentUser = savedUser ? JSON.parse(savedUser) : null;
-    this.loadApprovals();
+    const navigationMessage = history.state?.budgetSubmissionMessage;
+    if (navigationMessage) {
+      this.message = navigationMessage;
+    }
+    this.route.queryParamMap.subscribe((params) => {
+      this.selectedStatus = params.get('status') || 'All';
+      this.highlightedBudgetId = params.get('budgetId') || '';
+    });
     this.loadAuthorities();
   }
 
@@ -42,11 +67,15 @@ export class Approvals implements OnInit {
       next: (data) => {
         const records = Array.isArray(data) ? data : data?.authorities;
         this.authorities = Array.isArray(records) ? records : [];
-        if (!this.selectedAuthorityId && this.authorities.length) this.selectedAuthorityId = this.authorities[0].authorityId;
+        if (!this.selectedAuthorityId && this.authorities.length) {
+          this.selectedAuthorityId = this.authorities[0].authorityId;
+        }
+        this.loadApprovals();
         this.changeDetector.detectChanges();
       },
       error: () => {
         this.message = 'Unable to load the authority directory. Check that the backend is running.';
+        this.loadApprovals();
         this.changeDetector.detectChanges();
       }
     });
@@ -58,17 +87,32 @@ export class Approvals implements OnInit {
       return;
     }
     this.http.post(`${environment.apiBaseUrl}/api/approval-authorities`, this.authority).subscribe({
-      next: () => { this.message = 'Authority registered and ID generated.'; this.authority = { name: '', role: '', constituency: '', constituencyNumber: '', state: 'Maharashtra', party: '', ministry: '', contact: '', source: 'User-provided manual registration', sourceUrl: '' }; this.loadAuthorities(); },
+      next: () => { this.message = 'Authority registered and ID generated. Matching pending department budgets will be routed to this authority.'; this.authority = { name: '', role: '', constituency: '', constituencyNumber: '', state: 'Maharashtra', party: '', ministry: '', contact: '', source: 'User-provided manual registration', sourceUrl: '' }; this.loadAuthorities(); },
       error: (error: any) => this.message = error.error?.message || 'Unable to register authority.'
     });
   }
 
   loadApprovals() {
-    this.budgetService.getBudgets().subscribe((stored: any[]) => {
-      this.approvals = (stored || []).filter((item: any) => this.canViewDepartment(item.department)).map((item: any) => ({
-      ...item,
-      status: item.status || 'Pending Approval'
-      }));
+    this.budgetService.getBudgets().subscribe({
+      next: (stored: any[]) => {
+        this.approvals = (stored || [])
+          .filter((item: any) => this.canViewDepartment(item.department))
+          .map((item: any) => ({
+            ...item,
+            status: item.status || 'Pending Approval',
+            assignedAuthorities: this.getAssignedAuthorities(item)
+          }));
+        for (const item of this.approvals) {
+          if (!this.selectedAuthorityByBudget[item._id] && item.assignedAuthorities.length) {
+            this.selectedAuthorityByBudget[item._id] = item.assignedAuthorities[0].authorityId;
+          }
+        }
+        this.changeDetector.detectChanges();
+      },
+      error: (error: any) => {
+        this.message = error?.error?.message || 'Unable to load budget approvals.';
+        this.changeDetector.detectChanges();
+      }
     });
   }
 
@@ -85,14 +129,24 @@ export class Approvals implements OnInit {
       this.message = 'You can only act on budgets assigned to your department.';
       return;
     }
-    if (!this.selectedAuthorityId) {
-      this.message = 'Register or select an authorized CM, DCM, MLA, PM, or MP first.';
+    const authorityId = this.selectedAuthorityByBudget[item._id];
+    const assignedAuthority = (item.assignedAuthorities || [])
+      .find((member: any) => member.authorityId === authorityId);
+    if (!assignedAuthority) {
+      this.message = 'No active authority is assigned to this budget department and state.';
       return;
     }
-    this.budgetService.updateBudgetStatus(item._id, status, this.selectedAuthorityId).subscribe({
-      next: () => { this.message = `Budget ${status.toLowerCase()} by ${this.selectedAuthorityId}.`; this.loadApprovals(); },
+    this.budgetService.updateBudgetStatus(item._id, status, authorityId).subscribe({
+      next: () => { this.message = `Budget ${status.toLowerCase()} by ${assignedAuthority.name} (${assignedAuthority.authorityId}).`; this.loadApprovals(); },
       error: (error: any) => this.message = error.error?.message || 'Authority action was rejected.'
     });
+  }
+
+  private getAssignedAuthorities(budget: any): any[] {
+    const assignedIds = new Set(budget.assignedAuthorityIds || []);
+    return this.authorities.filter(
+      (authority) => authority.active !== false && assignedIds.has(authority.authorityId)
+    );
   }
 
   private canViewDepartment(department: string): boolean {
@@ -149,13 +203,4 @@ export class Approvals implements OnInit {
     this.selectedAuthorityId = member.authorityId;
   }
 
-  get selectedAuthority() {
-    return this.authorities.find((member: any) => member.authorityId === this.selectedAuthorityId);
-  }
-
-  get selectableAuthorities() {
-    const query = this.authorityLookup.trim().toLowerCase();
-    return this.authorities.filter((member: any) => !query || [member.name, member.authorityId, member.role, member.party, member.constituency, member.state]
-      .some((value) => String(value || '').toLowerCase().includes(query)));
-  }
 }

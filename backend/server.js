@@ -267,7 +267,17 @@ app.post("/login", async (req, res) => {
     }
 
     const token = jwt.sign({ id: user._id, role: user.role }, JWT_SECRET, { expiresIn: "1h" });
-    res.json({ message: "Login successful", token });
+    res.json({
+      message: "Login successful",
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        departmentId: user.departmentId
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: "Login failed", error: error.message });
   }
@@ -315,4 +325,3 @@ app.get("*", (req, res, next) => {
 app.listen(PORT, () => {
   console.log("Server Running on Port", PORT);
 });
-
